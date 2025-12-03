@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les Deux Chênes</title>
+    <meta name="description" content="Application de gestion viticole - Les Deux Chênes">
+    <meta name="theme-color" content="#722F37">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Les Deux Chênes">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    
+    <!-- Bibliothèques pour génération PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #1a1a1a; position: relative; color: white; min-height: 100vh; padding-bottom: 70px; }
+        body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), url('background.webp') center/cover fixed; background-attachment: fixed; z-index: -1; }
+        .header { background: rgba(0, 0, 0, 0.9); padding: 1rem; border-bottom: 2px solid #722F37; }
+        .header-content { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+        .logo-area { display: flex; align-items: center; gap: 0.75rem; }
+        .logo { width: 50px; height: 50px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; padding: 3px; box-shadow: 0 2px 8px rgba(212,175,55,0.3); }
+        .logo img { width: 100%; height: 100%; object-fit: contain; }
+        .title { font-size: 1.3rem; font-weight: bold; color: #D4AF37; }
+        .subtitle { font-size: 0.7rem; color: #9CA3AF; }
+        .export-btn { background: #D4AF37; color: #1a1a1a; padding: 0.5rem 1rem; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+        .nav { background: rgba(0, 0, 0, 0.9); padding: 0.5rem; overflow-x: auto; border-bottom: 2px solid #722F37; position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; }
+        .nav-tabs { display: flex; gap: 0.5rem; min-width: max-content; }
+        .tab { padding: 0.75rem 1rem; background: transparent; border: none; color: #9CA3AF; font-size: 0.9rem; cursor: pointer; white-space: nowrap; border-radius: 6px; }
+        .tab.active { background: linear-gradient(135deg, #722F37 0%, #8B4049 100%); color: white; }
+        .container { padding: 1rem; max-width: 1200px; margin: 0 auto; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+        .page-title { font-size: 1.8rem; font-weight: bold; color: #D4AF37; }
+        .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .btn { background: linear-gradient(135deg, #722F37 0%, #8B4049 100%); color: white; padding: 0.6rem 1rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+        .btn:active { transform: scale(0.95); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); }
+        .search-filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .search-input { flex: 1; min-width: 200px; padding: 0.75rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 0.9rem; }
+        .search-input::placeholder { color: #9CA3AF; }
+        .filter-select { padding: 0.75rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 0.9rem; min-width: 150px; }
+        .card { background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; backdrop-filter: blur(10px); }
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; color: #D4AF37; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { background: rgba(0, 0, 0, 0.8); border-left: 4px solid #D4AF37; border-radius: 12px; padding: 1rem; backdrop-filter: blur(10px); }
+        .stat-label { font-size: 0.75rem; color: #9CA3AF; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 2rem; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { background: linear-gradient(135deg, #722F37 0%, #8B4049 100%); padding: 0.75rem 0.5rem; text-align: left; font-weight: 600; }
+        td { padding: 0.75rem 0.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .badge { padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .badge-green { background: rgba(16, 185, 129, 0.2); color: #10B981; }
+        .badge-blue { background: rgba(59, 130, 246, 0.2); color: #3B82F6; }
+        .badge-yellow { background: rgba(245, 158, 11, 0.2); color: #F59E0B; }
+        .badge-orange { background: rgba(249, 115, 22, 0.2); color: #F97316; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 1000; overflow-y: auto; padding: 1rem; }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: linear-gradient(135deg, #2d1b1b 0%, #1a1a1a 100%); border: 2px solid #722F37; border-radius: 16px; padding: 1.5rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .modal-title { font-size: 1.3rem; font-weight: bold; color: #D4AF37; }
+        .close { background: none; border: none; color: white; font-size: 2rem; cursor: pointer; padding: 0; width: 30px; height: 30px; line-height: 1; }
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; color: #9CA3AF; font-size: 0.85rem; margin-bottom: 0.5rem; }
+        .form-input, .form-select, textarea { width: 100%; padding: 0.75rem; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 0.95rem; }
+        textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+        .form-input:focus, .form-select:focus, textarea:focus { outline: none; border-color: #722F37; }
+        .form-actions { display: flex; gap: 0.5rem; margin-top: 1.5rem; }
+        .btn-primary { background: linear-gradient(135deg, #722F37 0%, #8B4049 100%); flex: 1; }
+        .photo-upload { position: relative; width: 100px; height: 100px; border: 2px dashed rgba(212, 175, 55, 0.5); border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+        .photo-upload img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-upload input { display: none; }
+        .photo-preview { font-size: 0.8rem; color: #9CA3AF; text-align: center; }
+        .client-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        .client-card { background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 1rem; position: relative; }
+        .client-card-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; }
+        .client-photo { width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, #722F37 0%, #8B4049 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .client-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .client-actions { display: flex; gap: 0.5rem; }
+        .icon-btn { background: none; border: none; color: #9CA3AF; cursor: pointer; font-size: 1.2rem; padding: 0.25rem; }
+        .icon-btn:hover { color: #D4AF37; }
+        .client-name { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .client-info { font-size: 0.85rem; color: #9CA3AF; margin-bottom: 0.25rem; }
+        .client-files { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .file-link { display: inline-block; margin-right: 0.5rem; margin-bottom: 0.5rem; padding: 0.25rem 0.75rem; background: rgba(212, 175, 55, 0.2); border-radius: 6px; font-size: 0.8rem; color: #D4AF37; text-decoration: none; }
+        .stock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .stock-card { background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 1rem; }
+        .stock-header { display: flex; justify-content: space-between; margin-bottom: 0.75rem; align-items: start; }
+        .stock-photo { width: 50px; height: 50px; border-radius: 8px; overflow: hidden; background: linear-gradient(135deg, #4A5D23 0%, #6B8E23 100%); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .stock-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .stock-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .stock-client { font-size: 0.8rem; color: #9CA3AF; margin-bottom: 0.75rem; }
+        .stock-qty { display: flex; justify-content: space-between; margin-bottom: 0.75rem; }
+        .stock-value { font-size: 1.8rem; font-weight: bold; }
+        .stock-actions { display: flex; gap: 0.5rem; }
+        .stock-btn { flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 0.5rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+        .personnel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+        .person-card { background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: 1rem; cursor: pointer; }
+        .person-card:hover { border-color: #D4AF37; }
+        .person-header { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: center; }
+        .avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #722F37 0%, #8B4049 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .pointage-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .pointage-btn { width: 100%; margin-top: 0.5rem; }
+        .hours-summary { background: rgba(212, 175, 55, 0.1); border: 1px solid #D4AF37; border-radius: 8px; padding: 0.75rem; margin-top: 0.75rem; }
+        .hours-summary-item { display: flex; justify-content: space-between; padding: 0.25rem 0; font-size: 0.9rem; }
+        .hours-summary-item strong { color: #D4AF37; }
+        .map-container { width: 100%; height: 400px; background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; overflow: hidden; margin-bottom: 1rem; }
+        option { background: #1a1a1a; color: white; }
+        .action-btns { display: flex; gap: 0.5rem; }
+        .history-list { max-height: 300px; overflow-y: auto; }
+        .history-item { padding: 0.75rem; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 0.5rem; }
+        .history-date { font-size: 0.8rem; color: #9CA3AF; margin-bottom: 0.25rem; }
+        .history-hours { font-size: 1.1rem; font-weight: 600; color: #D4AF37; }
+    </style>
+</head>
+<body>
+<div class="header">
+<div class="header-content">
+<div class="logo-area">
+<div class="logo"><img src="logo.png" alt="Les Deux Chênes"></div>
+<div><div class="title">Les Deux Chênes</div><div class="subtitle">Gestion Viticole</div></div>
+</div>
+<div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+<div id="syncStatus" style="font-size:0.75rem;color:#9CA3AF;display:flex;align-items:center;gap:0.5rem">
+<span id="syncIndicator">●</span>
+<span id="syncText">Local</span>
+</div>
+<button class="export-btn" onclick="toggleSyncMode()" id="syncModeBtn" style="background:rgba(212,175,55,0.2);color:#D4AF37">📡 Mode Synchro</button>
+<button class="export-btn" onclick="forceSyncNow()" id="forceSyncBtn" style="display:none">⚡ Synchro</button>
+<button class="export-btn" onclick="document.getElementById('importFile').click()">📂 Import</button>
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">
+<button class="export-btn" onclick="exportGeneral()">📊 Export</button>
+</div>
+</div>
+</div>
+<div class="nav">
+<div class="nav-tabs">
+<button class="tab active" onclick="changeTab('dashboard')">📊 Dashboard</button>
+<button class="tab" onclick="changeTab('clients')">👥 Clients</button>
+<button class="tab" onclick="changeTab('interventions')">📋 Interventions</button>
+<button class="tab" onclick="changeTab('stocks')">📦 Stocks</button>
+<button class="tab" onclick="changeTab('personnel')">👷 Personnel</button>
+<button class="tab" onclick="changeTab('parcelles')">🗺️ Parcelles</button>
+</div>
+</div>
+<div class="container">
+<div id="dashboard" class="section active">
+<h1 class="page-title" style="margin-bottom:1rem">Tableau de Bord</h1>
+<div class="stat-grid">
+<div class="stat-card"><div class="stat-label">Clients</div><div class="stat-value" id="countClients">0</div></div>
+<div class="stat-card"><div class="stat-label">Interventions</div><div class="stat-value" id="countInterventions">0</div></div>
+<div class="stat-card"><div class="stat-label">Alertes stock</div><div class="stat-value" style="color:#F97316" id="countAlertes">0</div></div>
+<div class="stat-card"><div class="stat-label">Employés</div><div class="stat-value" id="countPersonnel">0</div></div>
+</div>
+<div class="card"><div class="card-title">📅 Dernières interventions</div><div id="dashInterventions"></div></div>
+</div>
+
+<div id="clients" class="section">
+<div class="page-header"><h1 class="page-title">Clients</h1>
+<div class="btn-group"><button class="btn" onclick="exportCSV('clients')">📥 CSV</button><button class="btn" onclick="generatePDFClients()">📄 PDF</button><button class="btn" onclick="showModal('modalClient')">+ Ajouter</button></div></div>
+<div class="search-filter-bar">
+<input type="text" class="search-input" id="searchClients" placeholder="🔍 Rechercher un client..." oninput="filterClients()">
+<select class="filter-select" id="filterClients" onchange="filterClients()">
+<option value="">Tous les clients</option>
+<option value="hasEmail">Avec email</option>
+<option value="hasPhone">Avec téléphone</option>
+<option value="large">Grande surface (&gt;5ha)</option>
+</select>
+</div>
+<div class="client-grid" id="clientsContent"></div>
+</div>
+
+<div id="interventions" class="section">
+<div class="page-header"><h1 class="page-title">Interventions</h1>
+<div class="btn-group"><button class="btn" onclick="exportCSV('interventions')">📥 CSV</button><button class="btn" onclick="showPDFInterventionsModal()">📄 PDF</button><button class="btn" onclick="showModal('modalIntervention')">+ Ajouter</button></div></div>
+<div class="search-filter-bar">
+<input type="text" class="search-input" id="searchInterventions" placeholder="🔍 Rechercher..." oninput="filterInterventions()">
+<select class="filter-select" id="filterInterventions" onchange="filterInterventions()">
+<option value="">Tous les types</option>
+<option value="Traitement phytosanitaire">Traitement phyto</option>
+<option value="Taille">Taille</option>
+<option value="Palissage">Palissage</option>
+</select>
+</div>
+<div class="card"><div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Client</th><th>Type</th><th>Durée</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="tableInterventions"></tbody></table></div></div>
+</div>
+
+<div id="stocks" class="section">
+<div class="page-header"><h1 class="page-title">Stocks Phyto</h1>
+<div class="btn-group"><button class="btn" onclick="exportCSV('stocks')">📥 CSV</button><button class="btn" onclick="generatePDFStocks()">📄 PDF</button><button class="btn" onclick="showModalProduits()">📦 Gérer produits</button><button class="btn" onclick="showModal('modalStock')">+ Stock client</button></div></div>
+<div class="search-filter-bar">
+<input type="text" class="search-input" id="searchStocks" placeholder="🔍 Rechercher un produit..." oninput="filterStocks()">
+<select class="filter-select" id="filterStocks" onchange="filterStocks()">
+<option value="">Tous les produits</option>
+<option value="Citrothiol">Citrothiol</option>
+<option value="Héliocuivre">Héliocuivre</option>
+<option value="Fluidosoufre">Fluidosoufre</option>
+<option value="alert">Alerte stock</option>
+</select>
+</div>
+<div id="stocksContent"></div>
+</div>
+
+<div id="personnel" class="section">
+<div class="page-header"><h1 class="page-title">Personnel</h1>
+<div class="btn-group"><button class="btn" onclick="exportCSV('personnel')">📥 CSV</button><button class="btn" onclick="showPDFPersonnelModal()">📄 PDF</button><button class="btn" onclick="showModal('modalPersonnel')">+ Ajouter</button></div></div>
+<div class="personnel-grid" id="personnelContent"></div>
+</div>
+
+<div id="parcelles" class="section">
+<h1 class="page-title" style="margin-bottom:1rem">Carte des Parcelles</h1>
+<div class="map-container"><iframe src="https://www.google.com/maps/d/embed?mid=1CfZty8M2hSI2lNN7aWbMpfzg-xhU-BqF&ehbc=2E312F" width="100%" height="100%" style="border:0" allowfullscreen loading="lazy"></iframe></div>
+<div class="stat-grid">
+<div class="stat-card"><div class="stat-label">📍 Parcelles</div><div class="stat-value" id="countParcelles">0</div></div>
+<div class="stat-card"><div class="stat-label">📏 Surface</div><div class="stat-value" id="surfaceTotale">0 ha</div></div>
+<div class="stat-card"><div class="stat-label">👥 Clients actifs</div><div class="stat-value" id="clientsActifs">0</div></div>
+</div>
+</div>
+</div>
+
+<!-- Modal Client -->
+<div id="modalClient" class="modal">
+<div class="modal-content">
+<div class="modal-header"><h2 class="modal-title" id="modalClientTitle">Nouveau Client</h2><button class="close" onclick="hideModal('modalClient')">×</button></div>
+<input type="hidden" id="clientId">
+<div class="form-group">
+<label class="form-label">Photo</label>
+<div class="photo-upload" onclick="document.getElementById('clientPhoto').click()">
+<img id="clientPhotoPreview" style="display:none">
+<div class="photo-preview" id="clientPhotoText">📷 Ajouter photo</div>
+<input type="file" id="clientPhoto" accept="image/*" onchange="previewPhoto(this, 'clientPhotoPreview', 'clientPhotoText')">
+</div>
+</div>
+<div class="form-group"><label class="form-label">Nom *</label><input type="text" class="form-input" id="clientNom"></div>
+<div class="form-group"><label class="form-label">Téléphone</label><input type="tel" class="form-input" id="clientTel"></div>
+<div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="clientEmail"></div>
+<div class="form-group"><label class="form-label">Adresse</label><input type="text" class="form-input" id="clientAdresse"></div>
+<div class="form-group"><label class="form-label">Surface (ha)</label><input type="number" step="0.1" class="form-input" id="clientSurface"></div>
+<div class="form-group"><label class="form-label">Fichiers / Liens Drive</label><textarea class="form-input" id="clientFiles" placeholder="Un lien par ligne&#10;Ex: https://drive.google.com/..."></textarea></div>
+<div class="form-actions"><button class="btn btn-secondary" onclick="hideModal('modalClient')">Annuler</button><button class="btn btn-primary" onclick="saveClient()">Enregistrer</button></div>
+</div>
+</div>
+
+<!-- Modal Intervention -->
+<div id="modalIntervention" class="modal">
+<div class="modal-content">
+<div class="modal-header"><h2 class="modal-title" id="modalInterventionTitle">Nouvelle Intervention</h2><button class="close" onclick="hideModal('modalIntervention')">×</button></div>
+<input type="hidden" id="intId">
+<div class="form-group"><label class="form-label">Date *</label><input type="date" class="form-input" id="intDate"></div>
+<div class="form-group"><label class="form-label">Client *</label><select class="form-select" id="intClient"><option value="">Sélectionner</option></select></div>
+<div class="form-group"><label class="form-label">Parcelle *</label><input type="text" class="form-input" id="intParcelle"></div>
+<div class="form-group"><label class="form-label">Type de travail *</label><select class="form-select" id="intType"><option value="">Sélectionner</option><option>Arrosage des complants (avec cuve sur tracteur)</option><option>Attachage / liage</option><option>Broyage des sarments</option><option>Broyeur d'accotement</option><option>Complantation (remplacement des ceps morts)</option><option>Comptage des manquants</option><option>Débroussaillage</option><option>Désherbage chimique des restanques</option><option>Désherbage chimique sur le rang</option><option>Ébourgeonnage (sagattes)</option><option>Écimage / Rognage mécanique</option><option>Écimage manuel</option><option>Entretien du palissage</option><option>Épandage d'engrais</option><option>Epareuse, tonte et entretien des talus</option><option>Griffage de l'inter-rang</option><option>Gyrobroyage (tonte de l'herbe)</option><option>Interceps binage rang + griffage inter-rang</option><option>Main d'oeuvre vendange</option><option>Mini-pelle 2,5t</option><option>Mini-pelle 8 tonnes</option><option>Mise en tas</option><option>Piochage</option><option>Prétaillage mécanique</option><option>Ramassage et évacuation des vignes et bois morts</option><option>Retrait des ficelles</option><option>Rotavator</option><option>Taille de la vigne</option><option>Tirage des sarments</option><option>Tondeuse interceps (tonte sur le rang)</option><option>Traitement phytosanitaire</option><option>Transport de la vendange</option><option>Vendange verte</option><option>Autre</option></select></div>
+<div class="form-group"><label class="form-label">Durée (heures) *</label><input type="number" step="0.5" class="form-input" id="intDuree" placeholder="Ex: 2.5"></div>
+<div class="form-group"><label class="form-label">Statut</label><select class="form-select" id="intStatut"><option>Planifié</option><option>En cours</option><option>Terminé</option></select></div>
+<div class="form-actions"><button class="btn btn-secondary" onclick="hideModal('modalIntervention')">Annuler</button><button class="btn btn-primary" onclick="saveIntervention()">Enregistrer</button></div>
+</div>
+</div>
+
+<!-- Modal Stock -->
+<!-- Modal Produit (Catalogue) -->
+<div id="modalProduit" class="modal">
+<div class="modal-content">
+<div class="modal-header"><h2 class="modal-title" id="modalProduitTitle">Nouveau Produit</h2><button class="close" onclick="hideModal('modalProduit')">×</button></div>
+<input type="hidden" id="produitId">
+<div class="form-group">
+<label class="form-label">Photo du produit</label>
+<div class="photo-upload" onclick="document.getElementById('produitPhoto').click()">
+<img id="produitPhotoPreview" style="display:none">
+<div class="photo-preview" id="produitPhotoText">📷 Ajouter photo</div>
+<input type="file" id="produitPhoto" accept="image/*" onchange="previewPhoto(this, 'produitPhotoPreview', 'produitPhotoText')">
+</div>
+</div>
+<div class="form-group"><label class="form-label">Nom du produit *</label><input type="text" class="form-input" id="produitNom" placeholder="Ex: Héliocuivre"></div>
+<div class="form-group"><label class="form-label">Dose à l'hectare (vigne)</label><input type="text" class="form-input" id="produitDose" placeholder="Ex: 1.5 L/ha"></div>
+<div class="form-actions"><button class="btn btn-secondary" onclick="hideModal('modalProduit')">Annuler</button><button class="btn btn-primary" onclick="saveProduit()">Enregistrer</button></div>
+</div>
+</div>
+
+<!-- Modal Liste Produits -->
+<div id="modalListeProduits" class="modal">
+<div class="modal-content" style="max-width:800px">
+<div class="modal-header"><h2 class="modal-title">📦 Catalogue Produits</h2><button class="close" onclick="hideModal('modalListeProduits')">×</button></div>
+<button class="btn btn-primary" style="margin-bottom:1rem" onclick="showModal('modalProduit')">+ Nouveau produit</button>
+<div id="produitsList" class="stock-grid"></div>
+</div>
+</div>
+
+<div id="modalStock" class="modal">
+<div class="modal-content">
+<div class="modal-header"><h2 class="modal-title" id="modalStockTitle">Stock Client</h2><button class="close" onclick="hideModal('modalStock')">×</button></div>
+<input type="hidden" id="stockId">
+<div class="form-group"><label class="form-label">Client *</label><select class="form-select" id="stockClient"><option value="">Sélectionner</option></select></div>
+<div class="form-group"><label class="form-label">Produit *</label><select class="form-select" id="stockProduit"><option value="">Sélectionner</option></select></div>
+<div class="form-group"><label class="form-label">Quantité *</label><input type="number" step="0.1" class="form-input" id="stockQuantite"></div>
+<div class="form-group"><label class="form-label">Unité *</label><select class="form-select" id="stockUnite"><option>L</option><option>kg</option><option>unité</option></select></div>
+<div class="form-group"><label class="form-label">Seuil d'alerte *</label><input type="number" step="0.1" class="form-input" id="stockSeuil"></div>
+<div class="form-actions"><button class="btn btn-secondary" onclick="hideModal('modalStock')">Annuler</button><button class="btn btn-primary" onclick="saveStock()">Enregistrer</button></div>
+</div>
+</div>
+
+<!-- Modal Personnel -->
+<div id="modalPersonnel" class="modal">
+<div class="modal-content">
+<div class="modal-header"><h2 class="modal-title" id="modalPersonnelTitle">Nouvel Employé</h2><button class="close" onclick="hideModal('modalPersonnel')">×</button></div>
+<input type="hidden" id="persId">
+<div class="form-group">
+<label class="form-label">Photo</label>
+<div class="photo-upload" onclick="document.getElementById('persPhoto').click()">
+<img id="persPhotoPreview" style="display:none">
+<div class="photo-preview" id="persPhotoText">📷 Ajouter photo</div>
+<input type="file" id="persPhoto" accept="image/*" onchange="previewPhoto(this, 'persPhotoPreview', 'persPhotoText')">
+</div>
+</div>
+<div class="form-group"><label class="form-label">Nom *</label><input type="text" class="form-input" id="persNom"></div>
+<div class="form-group"><label class="form-label">Poste *</label><input type="text" class="form-input" id="persPoste"></div>
+<div class="form-group"><label class="form-label">Taux horaire (€/h)</label><input type="number" step="0.01" class="form-input" id="persTauxHoraire" placeholder="0.00"></div>
+<div class="form-group"><label class="form-label">Statut</label><select class="form-select" id="persStatut"><option>Actif</option><option>Inactif</option></select></div>
+<div class="form-actions"><button class="btn btn-secondary" onclick="hideModal('modalPersonnel')">Annuler</button><button class="btn btn-primary" onclick="savePersonnel()">Enregistrer</button></div>
+</div>
+</div>
+
+<!-- Modal Détails Personnel -->
+<div id="modalPersonnelDetail" class="modal">
+<div class="modal-content">
+<div class="modal-header"><h2 class="modal-title" id="detailPersonnelNom"></h2><button class="close" onclick="hideModal('modalPersonnelDetail')">×</button></div>
+<div id="detailPersonnelContent"></div>
+</div>
+</div>
+
+<!-- Modal Ajout Manuel Heures -->
+<div id="modalAddHours" class="modal">
+<div class="modal-content">
+<div class="modal-header"><h2 class="modal-title" id="modalAddHoursTitle">Ajouter des heures</h2><button class="close" onclick="hideModal('modalAddHours')">×</button></div>
+<input type="hidden" id="addHoursPersonId">
+<input type="hidden" id="addHoursIndex">
+<div class="form-group"><label class="form-label">Date *</label><input type="date" class="form-input" id="addHoursDate"></div>
+<div class="form-group"><label class="form-label">Nombre d'heures *</label><input type="number" step="0.5" class="form-input" id="addHoursValue" placeholder="Ex: 8"></div>
+<div class="form-group"><label class="form-label">Taux horaire (€/h)</label><input type="number" step="0.01" class="form-input" id="addHoursRate" placeholder="0.00"></div>
+<div class="form-group"><label class="form-label">Type de tâche</label><select class="form-select" id="addHoursTask"><option>Arrosage des complants (avec cuve sur tracteur)</option><option>Attachage / liage</option><option>Broyage des sarments</option><option>Broyeur d'accotement</option><option>Complantation (remplacement des ceps morts)</option><option>Comptage des manquants</option><option>Débroussaillage</option><option>Désherbage chimique des restanques</option><option>Désherbage chimique sur le rang</option><option>Ébourgeonnage (sagattes)</option><option>Écimage / Rognage mécanique</option><option>Écimage manuel</option><option>Entretien du palissage</option><option>Épandage d'engrais</option><option>Epareuse, tonte et entretien des talus</option><option>Griffage de l'inter-rang</option><option>Gyrobroyage (tonte de l'herbe)</option><option>Interceps binage rang + griffage inter-rang</option><option>Main d'oeuvre vendange</option><option>Mini-pelle 2,5t</option><option>Mini-pelle 8 tonnes</option><option>Mise en tas</option><option>Piochage</option><option>Prétaillage mécanique</option><option>Ramassage et évacuation des vignes et bois morts</option><option>Retrait des ficelles</option><option>Rotavator</option><option>Taille de la vigne</option><option>Tirage des sarments</option><option>Tondeuse interceps (tonte sur le rang)</option><option>Traitement phytosanitaire</option><option>Transport de la vendange</option><option>Vendange verte</option><option>Autre</option></select></div>
+<div class="form-actions"><button class="btn btn-secondary" onclick="hideModal('modalAddHours')">Annuler</button><button class="btn btn-primary" onclick="saveManualHours()">Enregistrer</button></div>
+</div>
+</div>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('service-worker.js').then(r=>console.log('✅ SW:',r)).catch(e=>console.log('❌ SW:',e));})}
+
+const API_URL='https://script.google.com/macros/s/AKfycbwodQstnPfZf4mOrfvChMoi1zw9ycHXIi8QcvG9jul6ZyPISRIf9rWApQQq3r_h6w6x/exec';
+
+let data={clients:[],interventions:[],stocks:[],personnel:[],produits:[]};
+let syncMode='local'; // 'local' ou 'sync'
+let syncInterval=null;
+let lastSyncTime=null;
+
+// SYSTÈME DE SYNCHRO HYBRIDE BIDIRECTIONNEL
+async function loadData(){
+    // Toujours charger depuis localStorage d'abord
+    const local=localStorage.getItem('deuxchenes_data');
+    if(local){
+        try{
+            data=JSON.parse(local);
+            console.log('✅ Données locales chargées');
+        }catch(e){
+            console.error('❌ Erreur lecture locale:',e);
+        }
+    }
+    
+    // Charger le mode de synchro
+    const savedMode=localStorage.getItem('deuxchenes_syncmode');
+    if(savedMode){
+        syncMode=savedMode;
+        updateSyncUI();
+    }
+    
+    // Si mode synchro, récupérer depuis Sheets et fusionner
+    if(syncMode==='sync'){
+        await syncFromSheets();
+    }
+}
+
+async function saveData(){
+    // Ajouter timestamps à toutes les données modifiées
+    const now=Date.now();
+    addTimestamps(data,now);
+    
+    // Toujours sauvegarder en local
+    try{
+        localStorage.setItem('deuxchenes_data',JSON.stringify(data));
+        console.log('✅ Sauvegarde locale OK');
+    }catch(e){
+        console.error('❌ Erreur sauvegarde locale:',e);
+    }
+    
+    // Si mode synchro, envoyer vers Sheets
+    if(syncMode==='sync'){
+        await syncToSheets();
+    }
+}
+
+function addTimestamps(data,timestamp){
+    ['clients','interventions','stocks','personnel','produits'].forEach(key=>{
+        if(data[key]){
+            data[key].forEach(item=>{
+                if(!item.lastModified||item.lastModified<timestamp){
+                    item.lastModified=timestamp;
+                }
+            });
+        }
+    });
+}
+
+async function syncFromSheets(){
+    try{
+        updateSyncStatus('syncing','Synchronisation...');
+        const url=API_URL+'?action=get&_='+ Date.now();
+        const res=await fetch(url,{method:'GET'});
+        
+        if(!res.ok){
+            console.warn('⚠️ Sheets non disponible');
+            updateSyncStatus('offline','Hors-ligne');
+            return;
+        }
+        
+        const serverData=await res.json();
+        if(serverData&&serverData.clients){
+            // Fusion intelligente
+            data=mergeData(data,serverData);
+            localStorage.setItem('deuxchenes_data',JSON.stringify(data));
+            lastSyncTime=Date.now();
+            updateSyncStatus('online','Synchronisé');
+            console.log('✅ Synchro Sheets → Local OK');
+        }
+    }catch(err){
+        console.error('❌ Erreur synchro Sheets:',err);
+        updateSyncStatus('offline','Erreur synchro');
+    }
+}
+
+async function syncToSheets(){
+    try{
+        const body=new URLSearchParams();
+        body.append('action','save');
+        body.append('data',JSON.stringify(data));
+        
+        const res=await fetch(API_URL,{
+            method:'POST',
+            body:body
+        });
+        
+        if(!res.ok){
+            console.warn('⚠️ Envoi Sheets échoué');
+            return;
+        }
+        
+        const resp=await res.json();
+        if(resp.status==='ok'){
+            lastSyncTime=Date.now();
+            updateSyncStatus('online','Synchronisé');
+            console.log('✅ Synchro Local → Sheets OK');
+        }
+    }catch(err){
+        console.error('❌ Erreur envoi Sheets:',err);
+    }
+}
+
+// FUSION INTELLIGENTE (garde la version la plus récente)
+function mergeData(localData,serverData){
+    const merged={
+        clients:[],
+        interventions:[],
+        stocks:[],
+        personnel:[],
+        produits:[]
+    };
+    
+    ['clients','interventions','stocks','personnel','produits'].forEach(key=>{
+        const localItems=localData[key]||[];
+        const serverItems=serverData[key]||[];
+        const itemsMap=new Map();
+        
+        // Ajouter items locaux
+        localItems.forEach(item=>{
+            itemsMap.set(item.id,item);
+        });
+        
+        // Fusionner avec items serveur (garde le plus récent)
+        serverItems.forEach(serverItem=>{
+            // FIX ANDROID : Parser manualHours si c'est une string
+            if(key==='personnel'&&serverItem.manualHours){
+                if(typeof serverItem.manualHours==='string'){
+                    try{
+                        serverItem.manualHours=JSON.parse(serverItem.manualHours);
+                    }catch(e){
+                        console.warn('Erreur parse manualHours:',e);
+                        serverItem.manualHours=[];
+                    }
+                }
+                // S'assurer que c'est un tableau
+                if(!Array.isArray(serverItem.manualHours)){
+                    serverItem.manualHours=[];
+                }
+            }
+            
+            const localItem=itemsMap.get(serverItem.id);
+            if(!localItem){
+                // Nouveau depuis serveur
+                itemsMap.set(serverItem.id,serverItem);
+            }else{
+                // Existe des 2 côtés : garder le plus récent
+                const localTime=localItem.lastModified||0;
+                const serverTime=serverItem.lastModified||0;
+                if(serverTime>localTime){
+                    itemsMap.set(serverItem.id,serverItem);
+                }
+            }
+        });
+        
+        merged[key]=Array.from(itemsMap.values());
+    });
+    
+    return merged;
+}
+
+// CONTRÔLES UTILISATEUR
+function toggleSyncMode(){
+    if(syncMode==='local'){
+        syncMode='sync';
+        localStorage.setItem('deuxchenes_syncmode','sync');
+        startAutoSync();
+        syncFromSheets();
+        showNotification('📡 Mode synchronisation activé');
+    }else{
+        syncMode='local';
+        localStorage.setItem('deuxchenes_syncmode','local');
+        stopAutoSync();
+        updateSyncStatus('local','Mode local');
+        showNotification('💾 Mode local activé');
+    }
+    updateSyncUI();
+}
+
+function forceSyncNow(){
+    if(syncMode==='sync'){
+        syncFromSheets();
+        showNotification('⚡ Synchronisation forcée...');
+    }
+}
+
+function startAutoSync(){
+    stopAutoSync();
+    syncInterval=setInterval(()=>{
+        if(syncMode==='sync'){
+            syncFromSheets();
+        }
+    },5*60*1000); // 5 minutes
+}
+
+function stopAutoSync(){
+    if(syncInterval){
+        clearInterval(syncInterval);
+        syncInterval=null;
+    }
+}
+
+function updateSyncUI(){
+    const btn=document.getElementById('syncModeBtn');
+    const forceBtn=document.getElementById('forceSyncBtn');
+    
+    if(syncMode==='sync'){
+        btn.textContent='📡 Mode Synchro';
+        btn.style.background='linear-gradient(135deg, #10B981 0%, #059669 100%)';
+        btn.style.color='white';
+        forceBtn.style.display='block';
+    }else{
+        btn.textContent='💾 Mode Local';
+        btn.style.background='rgba(212,175,55,0.2)';
+        btn.style.color='#D4AF37';
+        forceBtn.style.display='none';
+    }
+}
+
+function updateSyncStatus(state,text){
+    const indicator=document.getElementById('syncIndicator');
+    const statusText=document.getElementById('syncText');
+    
+    if(!indicator||!statusText)return;
+    
+    statusText.textContent=text;
+    
+    if(state==='online'){
+        indicator.style.color='#10B981';
+    }else if(state==='syncing'){
+        indicator.style.color='#F59E0B';
+    }else if(state==='offline'){
+        indicator.style.color='#F97316';
+    }else{
+        indicator.style.color='#9CA3AF';
+    }
+}
+
+function changeTab(t){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(t).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));event.target.classList.add('active')}
+
+function showModal(id){document.getElementById(id).classList.add('show');if(id==='modalIntervention'||id==='modalStock'){populateSelects()}}
+function hideModal(id){document.getElementById(id).classList.remove('show');if(id==='modalClient'){resetClientForm()}if(id==='modalIntervention'){resetInterventionForm()}if(id==='modalStock'){resetStockForm()}if(id==='modalProduit'){resetProduitForm()}if(id==='modalPersonnel'){resetPersonnelForm()}}
+
+function populateSelects(){['intClient','stockClient'].forEach(id=>{const s=document.getElementById(id);s.innerHTML='<option value="">Sélectionner</option>';data.clients.forEach(c=>s.innerHTML+=`<option>${c.nom}</option>`)});populateProduitsSelect();document.getElementById('intDate').value=new Date().toISOString().split('T')[0]}
+
+function previewPhoto(input,previewId,textId){if(input.files&&input.files[0]){const reader=new FileReader();reader.onload=function(e){document.getElementById(previewId).src=e.target.result;document.getElementById(previewId).style.display='block';document.getElementById(textId).style.display='none'};reader.readAsDataURL(input.files[0])}}
+
+// CLIENTS
+function resetClientForm(){document.getElementById('clientId').value='';document.getElementById('modalClientTitle').textContent='Nouveau Client';document.getElementById('clientNom').value='';document.getElementById('clientTel').value='';document.getElementById('clientEmail').value='';document.getElementById('clientAdresse').value='';document.getElementById('clientSurface').value='';document.getElementById('clientFiles').value='';document.getElementById('clientPhoto').value='';document.getElementById('clientPhotoPreview').src='';document.getElementById('clientPhotoPreview').style.display='none';document.getElementById('clientPhotoText').style.display='block'}
+
+function editClient(id){const c=data.clients.find(x=>x.id===id);if(!c)return;document.getElementById('clientId').value=c.id;document.getElementById('modalClientTitle').textContent='Modifier Client';document.getElementById('clientNom').value=c.nom;document.getElementById('clientTel').value=c.tel||'';document.getElementById('clientEmail').value=c.email||'';document.getElementById('clientAdresse').value=c.adresse||'';document.getElementById('clientSurface').value=c.surface||'';document.getElementById('clientFiles').value=(c.files||[]).join('\n');if(c.photo){document.getElementById('clientPhotoPreview').src=c.photo;document.getElementById('clientPhotoPreview').style.display='block';document.getElementById('clientPhotoText').style.display='none'}showModal('modalClient')}
+
+function saveClient(){const id=document.getElementById('clientId').value;const c={id:id||Date.now(),nom:document.getElementById('clientNom').value,tel:document.getElementById('clientTel').value||'',email:document.getElementById('clientEmail').value||'',adresse:document.getElementById('clientAdresse').value||'',surface:parseFloat(document.getElementById('clientSurface').value)||0,files:(document.getElementById('clientFiles').value||'').split('\n').filter(x=>x.trim()),photo:document.getElementById('clientPhotoPreview').src||''};if(!c.nom){alert('Nom requis');return}if(id){const idx=data.clients.findIndex(x=>x.id==id);data.clients[idx]=c}else{data.clients.push(c)}saveData();renderClients();hideModal('modalClient');alert('✅ Client '+(id?'modifié':'ajouté'))}
+
+function deleteClient(id){if(confirm('Supprimer ce client?')){data.clients=data.clients.filter(c=>c.id!==id);saveData();renderClients()}}
+
+function filterClients(){const search=document.getElementById('searchClients').value.toLowerCase();const filter=document.getElementById('filterClients').value;let filtered=data.clients.filter(c=>c.nom.toLowerCase().includes(search)||c.email.toLowerCase().includes(search)||c.tel.includes(search));if(filter==='hasEmail')filtered=filtered.filter(c=>c.email);if(filter==='hasPhone')filtered=filtered.filter(c=>c.tel);if(filter==='large')filtered=filtered.filter(c=>c.surface>5);renderClientsFiltered(filtered)}
+
+function renderClientsFiltered(clients){const sorted=[...clients].sort((a,b)=>a.nom.localeCompare(b.nom));const c=document.getElementById('clientsContent');c.innerHTML=sorted.map(cl=>`<div class="client-card"><div class="client-card-header"><div class="client-photo">${cl.photo?`<img src="${cl.photo}">`:'👤'}</div><div class="client-actions"><button class="icon-btn" onclick="editClient(${cl.id})" title="Modifier">✏️</button><button class="icon-btn" onclick="deleteClient(${cl.id})" title="Supprimer">🗑️</button></div></div><div class="client-name">${cl.nom}</div>${cl.tel?`<div class="client-info">📞 ${cl.tel}</div>`:''}${cl.email?`<div class="client-info">✉️ ${cl.email}</div>`:''}${cl.adresse?`<div class="client-info">📍 ${cl.adresse}</div>`:''}${cl.surface>0?`<div class="client-info">📏 ${cl.surface} ha</div>`:''}${cl.files&&cl.files.length?`<div class="client-files">${cl.files.map(f=>`<a href="${f}" target="_blank" class="file-link">📄 Fichier</a>`).join('')}</div>`:''}</div>`).join('');updateStats()}
+
+function renderClients(){renderClientsFiltered(data.clients)}
+
+// INTERVENTIONS
+function resetInterventionForm(){document.getElementById('intId').value='';document.getElementById('modalInterventionTitle').textContent='Nouvelle Intervention';document.getElementById('intDate').value=new Date().toISOString().split('T')[0];document.getElementById('intClient').value='';document.getElementById('intParcelle').value='';document.getElementById('intType').value='';document.getElementById('intDuree').value='';document.getElementById('intStatut').value='Planifié'}
+
+function editIntervention(id){const i=data.interventions.find(x=>x.id===id);if(!i)return;document.getElementById('intId').value=i.id;document.getElementById('modalInterventionTitle').textContent='Modifier Intervention';document.getElementById('intDate').value=i.date;document.getElementById('intClient').value=i.client;document.getElementById('intParcelle').value=i.parcelle;document.getElementById('intType').value=i.type;document.getElementById('intDuree').value=i.duree||'';document.getElementById('intStatut').value=i.statut;populateSelects();showModal('modalIntervention')}
+
+function saveIntervention(){const id=document.getElementById('intId').value;const i={id:id||Date.now(),date:document.getElementById('intDate').value,client:document.getElementById('intClient').value,parcelle:document.getElementById('intParcelle').value,type:document.getElementById('intType').value,duree:parseFloat(document.getElementById('intDuree').value)||0,statut:document.getElementById('intStatut').value};if(!i.date||!i.client||!i.parcelle||!i.type){alert('Champs requis');return}if(id){const idx=data.interventions.findIndex(x=>x.id==id);data.interventions[idx]=i}else{data.interventions.push(i)}saveData();renderInterventions();hideModal('modalIntervention');alert('✅ Intervention '+(id?'modifiée':'ajoutée'))}
+
+function deleteIntervention(id){if(confirm('Supprimer?')){data.interventions=data.interventions.filter(i=>i.id!==id);saveData();renderInterventions()}}
+
+function filterInterventions(){const search=document.getElementById('searchInterventions').value.toLowerCase();const filter=document.getElementById('filterInterventions').value;let filtered=data.interventions.filter(i=>i.client.toLowerCase().includes(search)||i.type.toLowerCase().includes(search)||i.parcelle.toLowerCase().includes(search));if(filter)filtered=filtered.filter(i=>i.type===filter);renderInterventionsFiltered(filtered)}
+
+function renderInterventionsFiltered(interventions){const t=document.getElementById('tableInterventions');t.innerHTML=interventions.map(i=>`<tr><td>${new Date(i.date).toLocaleDateString('fr-FR')}</td><td><strong>${i.client}</strong><br><small>${i.parcelle}</small></td><td>${i.type}</td><td>${i.duree?i.duree+'h':'-'}</td><td><span class="badge badge-${i.statut==='Terminé'?'green':i.statut==='En cours'?'blue':'yellow'}">${i.statut}</span></td><td><div class="action-btns"><button class="icon-btn" onclick="editIntervention(${i.id})" title="Modifier">✏️</button><button class="icon-btn" onclick="deleteIntervention(${i.id})" title="Supprimer">🗑️</button></div></td></tr>`).join('');updateDashInterventions()}
+
+function renderInterventions(){renderInterventionsFiltered(data.interventions)}
+
+function updateDashInterventions(){const d=document.getElementById('dashInterventions');d.innerHTML=data.interventions.slice(0,5).map(i=>`<div style="background:rgba(255,255,255,0.05);padding:0.75rem;margin-bottom:0.5rem;border-radius:8px"><div style="font-weight:600">${i.client} - ${i.parcelle}</div><div style="font-size:0.8rem;color:#9CA3AF">${i.type} • ${new Date(i.date).toLocaleDateString('fr-FR')}</div></div>`).join('')}
+
+// STOCKS
+function resetStockForm(){document.getElementById('stockId').value='';document.getElementById('modalStockTitle').textContent='Stock Client';document.getElementById('stockClient').value='';document.getElementById('stockProduit').value='';document.getElementById('stockQuantite').value='';document.getElementById('stockUnite').value='L';document.getElementById('stockSeuil').value=''}
+
+function editStock(id){const s=data.stocks.find(x=>x.id===id);if(!s)return;document.getElementById('stockId').value=s.id;document.getElementById('modalStockTitle').textContent='Modifier Stock';document.getElementById('stockClient').value=s.client;document.getElementById('stockProduit').value=s.produitId||s.produit;document.getElementById('stockQuantite').value=s.quantite;document.getElementById('stockUnite').value=s.unite;document.getElementById('stockSeuil').value=s.seuil;populateSelects();showModal('modalStock')}
+
+function saveStock(){const id=document.getElementById('stockId').value;const produitId=document.getElementById('stockProduit').value;if(!produitId){alert('Sélectionnez un produit');return}const produit=data.produits.find(p=>p.id==produitId);if(!produit){alert('Produit introuvable');return}const s={id:id||Date.now(),client:document.getElementById('stockClient').value,produitId:produitId,produit:produit.nom,photo:produit.photo||'',dose:produit.dose||'',quantite:parseFloat(document.getElementById('stockQuantite').value),unite:document.getElementById('stockUnite').value,seuil:parseFloat(document.getElementById('stockSeuil').value)};if(!s.client||isNaN(s.quantite)||!s.unite||isNaN(s.seuil)){alert('Champs requis');return}if(id){const idx=data.stocks.findIndex(x=>x.id==id);data.stocks[idx]=s}else{data.stocks.push(s)}saveData();renderStocks();hideModal('modalStock');alert('✅ Stock '+(id?'modifié':'ajouté'))}
+
+function updateStockQty(id,d){const s=data.stocks.find(x=>x.id===id);if(!s)return;const q=parseFloat(prompt(`${s.produit}\nStock: ${s.quantite} ${s.unite}\n\nQuantité à ${d>0?'ajouter':'retirer'}:`,'0'));if(isNaN(q)||q<=0)return;s.quantite+=d>0?q:-q;if(s.quantite<0)s.quantite=0;saveData();renderStocks();alert(`✅ Stock: ${s.quantite} ${s.unite}`)}
+
+function deleteStock(id){if(confirm('Supprimer?')){data.stocks=data.stocks.filter(s=>s.id!==id);saveData();renderStocks()}}
+
+function filterStocks(){const search=document.getElementById('searchStocks').value.toLowerCase();const filter=document.getElementById('filterStocks').value;let filtered=data.stocks.filter(s=>s.produit.toLowerCase().includes(search)||s.client.toLowerCase().includes(search));if(filter&&filter!=='alert')filtered=filtered.filter(s=>s.produit===filter);if(filter==='alert')filtered=filtered.filter(s=>s.quantite<s.seuil);renderStocksFiltered(filtered)}
+
+function renderStocksFiltered(stocks){const cnt=document.getElementById('stocksContent');cnt.innerHTML='<div class="stock-grid">'+stocks.map(s=>`<div class="stock-card"><div class="stock-header"><div class="stock-photo">${s.photo?`<img src="${s.photo}">`:'🧪'}</div><div>${s.quantite<s.seuil?'<span class="badge badge-orange">⚠️ Bas</span>':''}<button class="icon-btn" onclick="editStock(${s.id})" title="Modifier">✏️</button></div></div><div class="stock-title">${s.produit}</div><div class="stock-client">${s.client}</div><div class="stock-qty"><div><div style="font-size:0.7rem;color:#9CA3AF">Quantité</div><div class="stock-value" style="color:${s.quantite<s.seuil?'#F97316':'white'}">${s.quantite} <span style="font-size:0.9rem;color:#9CA3AF">${s.unite}</span></div></div><div style="text-align:right"><div style="font-size:0.7rem;color:#9CA3AF">Seuil</div><div>${s.seuil} ${s.unite}</div></div></div><div class="stock-actions"><button class="stock-btn" onclick="updateStockQty(${s.id},-1)">➖</button><button class="stock-btn" onclick="updateStockQty(${s.id},1)">➕</button><button class="stock-btn" onclick="deleteStock(${s.id})">🗑️</button></div></div>`).join('')+'</div>';updateStats()}
+
+function renderStocks(){renderStocksFiltered(data.stocks)}
+
+// PRODUITS (Catalogue)
+function resetProduitForm(){document.getElementById('produitId').value='';document.getElementById('modalProduitTitle').textContent='Nouveau Produit';document.getElementById('produitNom').value='';document.getElementById('produitDose').value='';document.getElementById('produitPhoto').value='';document.getElementById('produitPhotoPreview').src='';document.getElementById('produitPhotoPreview').style.display='none';document.getElementById('produitPhotoText').style.display='block'}
+
+function editProduit(id){const p=data.produits.find(x=>x.id===id);if(!p)return;document.getElementById('produitId').value=p.id;document.getElementById('modalProduitTitle').textContent='Modifier Produit';document.getElementById('produitNom').value=p.nom;document.getElementById('produitDose').value=p.dose||'';if(p.photo){document.getElementById('produitPhotoPreview').src=p.photo;document.getElementById('produitPhotoPreview').style.display='block';document.getElementById('produitPhotoText').style.display='none'}hideModal('modalListeProduits');showModal('modalProduit')}
+
+function saveProduit(){const id=document.getElementById('produitId').value;const p={id:id||Date.now(),nom:document.getElementById('produitNom').value,dose:document.getElementById('produitDose').value||'',photo:document.getElementById('produitPhotoPreview').src||''};if(!p.nom){alert('Nom du produit requis');return}if(id){const idx=data.produits.findIndex(x=>x.id==id);data.produits[idx]=p}else{data.produits.push(p)}saveData();renderProduits();populateProduitsSelect();hideModal('modalProduit');showModalProduits();alert('✅ Produit '+(id?'modifié':'ajouté'))}
+
+function deleteProduit(id){const hasStock=data.stocks.some(s=>s.produitId===id);if(hasStock){alert('⚠️ Impossible de supprimer : ce produit est utilisé dans des stocks');return}if(confirm('Supprimer ce produit du catalogue?')){data.produits=data.produits.filter(p=>p.id!==id);saveData();renderProduits();populateProduitsSelect()}}
+
+function showModalProduits(){renderProduits();showModal('modalListeProduits')}
+
+function renderProduits(){const c=document.getElementById('produitsList');if(!data.produits||data.produits.length===0){c.innerHTML='<p style="color:#9CA3AF;text-align:center;padding:2rem">Aucun produit. Cliquez sur "+ Nouveau produit" pour commencer.</p>';return}c.innerHTML=data.produits.map(p=>`<div class="stock-card"><div class="stock-header"><div class="stock-photo">${p.photo?`<img src="${p.photo}">`:'🧪'}</div><div><button class="icon-btn" onclick="editProduit(${p.id})" title="Modifier">✏️</button><button class="icon-btn" onclick="deleteProduit(${p.id})" title="Supprimer">🗑️</button></div></div><div class="stock-title">${p.nom}</div>${p.dose?`<div class="stock-client">📊 ${p.dose}</div>`:''}</div>`).join('')}
+
+function populateProduitsSelect(){const sel=document.getElementById('stockProduit');if(!sel)return;sel.innerHTML='<option value="">Sélectionner</option>';data.produits.forEach(p=>sel.innerHTML+=`<option value="${p.id}">${p.nom}</option>`)}
+
+// PERSONNEL
+function resetPersonnelForm(){document.getElementById('persId').value='';document.getElementById('modalPersonnelTitle').textContent='Nouvel Employé';document.getElementById('persNom').value='';document.getElementById('persPoste').value='';document.getElementById('persTauxHoraire').value='0';document.getElementById('persStatut').value='Actif';document.getElementById('persPhoto').value='';document.getElementById('persPhotoPreview').src='';document.getElementById('persPhotoPreview').style.display='none';document.getElementById('persPhotoText').style.display='block'}
+
+function editPersonnel(id){const p=data.personnel.find(x=>x.id===id);if(!p)return;document.getElementById('persId').value=p.id;document.getElementById('modalPersonnelTitle').textContent='Modifier Employé';document.getElementById('persNom').value=p.nom;document.getElementById('persPoste').value=p.poste;document.getElementById('persTauxHoraire').value=p.tauxHoraire||0;document.getElementById('persStatut').value=p.statut;if(p.photo){document.getElementById('persPhotoPreview').src=p.photo;document.getElementById('persPhotoPreview').style.display='block';document.getElementById('persPhotoText').style.display='none'}showModal('modalPersonnel')}
+
+function savePersonnel(){const id=document.getElementById('persId').value;const existing=id?data.personnel.find(x=>x.id==id):null;const p={id:id||Date.now(),nom:document.getElementById('persNom').value,poste:document.getElementById('persPoste').value,statut:document.getElementById('persStatut').value,photo:document.getElementById('persPhotoPreview').src||'',tauxHoraire:parseFloat(document.getElementById('persTauxHoraire').value)||0,manualHours:existing?existing.manualHours||[]:[]};if(!p.nom||!p.poste){alert('Champs requis');return}if(id){const idx=data.personnel.findIndex(x=>x.id==id);data.personnel[idx]=p}else{data.personnel.push(p)}saveData();renderPersonnel();hideModal('modalPersonnel');alert('✅ Employé '+(id?'modifié':'ajouté'))}
+
+function deletePersonnel(id){if(confirm('Supprimer cet employé ?')){data.personnel=data.personnel.filter(p=>p.id!==id);saveData();renderPersonnel()}}
+
+function showPersonnelDetail(id){const p=data.personnel.find(x=>x.id===id);if(!p)return;document.getElementById('detailPersonnelNom').textContent=p.nom;const hrs=calculateDetailedHours(p);let html=`<div class="person-header"><div class="avatar">${p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:p.nom.split(' ').map(n=>n[0]).join('')}</div><div style="flex:1"><div style="font-weight:600;font-size:1.2rem">${p.nom}</div><div style="color:#9CA3AF">${p.poste}</div><div style="color:#D4AF37;margin-top:0.5rem">Taux: ${p.tauxHoraire||0}€/h</div></div></div>`;html+=`<div class="hours-summary"><div class="hours-summary-item"><span>Heures aujourd'hui:</span><strong>${hrs.today}h</strong></div><div class="hours-summary-item"><span>Heures ce mois:</span><strong>${hrs.month}h</strong></div><div class="hours-summary-item"><span>Heures cette année:</span><strong>${hrs.year}h</strong></div><div class="hours-summary-item" style="border-top:1px solid rgba(212,175,55,0.3);padding-top:0.5rem;margin-top:0.5rem"><span>Coût ce mois:</span><strong style="color:#D4AF37">${hrs.costMonth}€</strong></div><div class="hours-summary-item"><span>Coût cette année:</span><strong style="color:#D4AF37">${hrs.costYear}€</strong></div></div>`;html+=`<div style="margin:1rem 0"><button class="btn btn-primary" onclick="showAddHoursModal(${id})">+ Ajouter heures</button><button class="btn btn-secondary" onclick="editPersonnel(${id})" style="margin-left:0.5rem">✏️ Modifier</button></div>`;html+=`<h3 style="color:#D4AF37;margin:1rem 0">Historique des heures</h3><div class="history-list">`;const allHours=(p.manualHours||[]).sort((a,b)=>(b.timestamp||b.date)-(a.timestamp||a.date));if(allHours.length===0){html+=`<div style="text-align:center;color:#9CA3AF;padding:2rem">Aucune heure enregistrée</div>`}else{allHours.forEach((h,idx)=>{html+=`<div class="history-item" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem;background:rgba(255,255,255,0.05);margin-bottom:0.5rem;border-radius:8px"><div style="flex:1"><div style="font-weight:600">${new Date(h.date).toLocaleDateString('fr-FR')}</div><div style="color:#9CA3AF;font-size:0.85rem">${h.task||'Travail'}</div></div><div style="font-weight:600;font-size:1.1rem;color:#D4AF37">${h.hours}h</div><div><button onclick="editManualHours(${id},${idx})" style="background:none;border:none;color:#3B82F6;cursor:pointer;font-size:1.2rem;padding:0.25rem">✏️</button><button onclick="deleteManualHours(${id},${idx})" style="background:none;border:none;color:#F97316;cursor:pointer;font-size:1.2rem;padding:0.25rem">🗑️</button></div></div>`})}html+=`</div>`;document.getElementById('detailPersonnelContent').innerHTML=html;showModal('modalPersonnelDetail')}
+
+function showAddHoursModal(id){const p=data.personnel.find(x=>x.id===id);document.getElementById('addHoursPersonId').value=id;document.getElementById('addHoursDate').value=new Date().toISOString().split('T')[0];document.getElementById('addHoursValue').value='';document.getElementById('addHoursTask').value='Traitement phytosanitaire';document.getElementById('addHoursRate').value=p?p.tauxHoraire||0:0;document.getElementById('addHoursIndex').value='';document.getElementById('modalAddHoursTitle').textContent='Ajouter des heures';hideModal('modalPersonnelDetail');showModal('modalAddHours')}
+
+function saveManualHours(){const id=parseInt(document.getElementById('addHoursPersonId').value);const hourIndex=document.getElementById('addHoursIndex').value;const p=data.personnel.find(x=>x.id===id);if(!p)return;const date=document.getElementById('addHoursDate').value;const hours=parseFloat(document.getElementById('addHoursValue').value);const task=document.getElementById('addHoursTask').value;const rate=parseFloat(document.getElementById('addHoursRate').value)||p.tauxHoraire||0;if(!date||isNaN(hours)||hours<=0){alert('Champs requis');return}if(!p.manualHours)p.manualHours=[];const hourData={date:new Date(date).getTime(),hours,task,rate,timestamp:Date.now()};if(hourIndex!==''){p.manualHours[parseInt(hourIndex)]=hourData}else{p.manualHours.push(hourData)}saveData();hideModal('modalAddHours');showPersonnelDetail(id);alert('✅ Heures '+(hourIndex!==''?'modifiées':'ajoutées'))}
+
+function editManualHours(personId,hourIndex){const p=data.personnel.find(x=>x.id===personId);if(!p||!p.manualHours||!p.manualHours[hourIndex])return;const h=p.manualHours[hourIndex];document.getElementById('addHoursPersonId').value=personId;document.getElementById('addHoursDate').value=new Date(h.date).toISOString().split('T')[0];document.getElementById('addHoursValue').value=h.hours;document.getElementById('addHoursTask').value=h.task||'Traitement phytosanitaire';document.getElementById('addHoursRate').value=h.rate||p.tauxHoraire||0;document.getElementById('addHoursIndex').value=hourIndex;document.getElementById('modalAddHoursTitle').textContent='Modifier les heures';hideModal('modalPersonnelDetail');showModal('modalAddHours')}
+
+function deleteManualHours(personId,hourIndex){if(!confirm('Supprimer ces heures ?'))return;const p=data.personnel.find(x=>x.id===personId);if(!p||!p.manualHours)return;p.manualHours.splice(hourIndex,1);saveData();showPersonnelDetail(personId)}
+
+function calculateHours(pts){const today=new Date().toLocaleDateString('fr-FR');const cM=new Date().getMonth();const cY=new Date().getFullYear();let hT=0,hM=0,last=null;pts.forEach(p=>{const pD=new Date(p.timestamp);const pDS=pD.toLocaleDateString('fr-FR');if(p.type==='Arrivée'){last=p.timestamp}else if(p.type==='Départ'&&last){const h=(p.timestamp-last)/(1000*60*60);if(pDS===today)hT+=h;if(pD.getMonth()===cM&&pD.getFullYear()===cY)hM+=h;last=null}});return{today:Math.round(hT*10)/10,month:Math.round(hM*10)/10}}
+
+function calculateDetailedHours(p){const today=new Date().toLocaleDateString('fr-FR');const cM=new Date().getMonth();const cY=new Date().getFullYear();let hT=0,hM=0,hY=0,hTotal=0,costM=0,costY=0;(p.manualHours||[]).forEach(mh=>{const mD=new Date(mh.date);const mDS=mD.toLocaleDateString('fr-FR');const rate=mh.rate||p.tauxHoraire||0;if(mDS===today)hT+=mh.hours;if(mD.getMonth()===cM&&mD.getFullYear()===cY){hM+=mh.hours;costM+=mh.hours*rate}if(mD.getFullYear()===cY){hY+=mh.hours;costY+=mh.hours*rate}hTotal+=mh.hours});return{today:Math.round(hT*10)/10,month:Math.round(hM*10)/10,year:Math.round(hY*10)/10,total:Math.round(hTotal*10)/10,costMonth:Math.round(costM),costYear:Math.round(costY),costTotal:Math.round(hTotal*(p.tauxHoraire||0))}}
+
+function renderPersonnel(){const c=document.getElementById('personnelContent');c.innerHTML=data.personnel.map(p=>{const init=p.nom.split(' ').map(n=>n[0]).join('');const hrs=calculateDetailedHours(p);return`<div class="person-card"><div class="person-header"><div class="avatar">${p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:init}</div><div style="flex:1"><div style="font-weight:600;font-size:1.1rem">${p.nom}</div><div style="color:#9CA3AF;font-size:0.85rem">${p.poste}</div><div style="color:#D4AF37;font-size:0.8rem;margin-top:0.25rem">${p.tauxHoraire||0}€/h</div><span class="badge badge-${p.statut==='Actif'?'green':'orange'}" style="margin-top:0.5rem">${p.statut}</span></div><button onclick="deletePersonnel(${p.id})" style="background:none;border:none;color:#F97316;cursor:pointer;font-size:1.2rem;padding:0.5rem">🗑️</button></div><div class="hours-summary" style="margin-top:1rem"><div class="hours-summary-item"><span>Heures ce mois:</span><strong>${hrs.month}h</strong></div><div class="hours-summary-item"><span>Coût ce mois:</span><strong>${hrs.costMonth}€</strong></div></div><div style="display:flex;gap:0.5rem;margin-top:1rem"><button class="btn" style="flex:1" onclick="showAddHoursModal(${p.id})">+ Heures</button><button class="btn" style="flex:1;background:#D4AF37;color:#1a1a1a" onclick="editPersonnel(${p.id})">✏️ Modifier</button><button class="btn" style="background:rgba(59,130,246,0.2);color:#3B82F6" onclick="showPersonnelDetail(${p.id})">📊 Détail</button></div></div>`}).join('');updateStats()}
+
+// STATS
+function updateStats(){document.getElementById('countClients').textContent=data.clients.length;document.getElementById('countInterventions').textContent=data.interventions.length;document.getElementById('countPersonnel').textContent=data.personnel.length;const al=data.stocks.filter(s=>s.quantite<s.seuil).length;document.getElementById('countAlertes').textContent=al;const tS=data.clients.reduce((s,c)=>s+(c.surface||0),0);document.getElementById('surfaceTotale').textContent=tS.toFixed(1)+' ha';document.getElementById('clientsActifs').textContent=data.clients.length;const pcs=new Set(data.interventions.map(i=>i.parcelle));document.getElementById('countParcelles').textContent=pcs.size}
+
+// EXPORTS
+function exportCSV(t){let r=[],f='';if(t==='clients'){r=['Nom;Tel;Email;Adresse;Surface',...data.clients.map(c=>`${c.nom};${c.tel};${c.email};${c.adresse};${c.surface}`)];f='clients.csv'}else if(t==='interventions'){r=['Date;Client;Parcelle;Type;Duree;Operateur;Statut',...data.interventions.map(i=>`${i.date};${i.client};${i.parcelle};${i.type};${i.duree||''};${i.operateur};${i.statut}`)];f='interventions.csv'}else if(t==='stocks'){r=['Client;Produit;Quantite;Unite;Seuil',...data.stocks.map(s=>`${s.client};${s.produit};${s.quantite};${s.unite};${s.seuil}`)];f='stocks.csv'}else if(t==='personnel'){r=['Nom;Poste;Statut',...data.personnel.map(p=>`${p.nom};${p.poste};${p.statut}`)];f='personnel.csv'}const csv=r.join('\n');const l=document.createElement('a');l.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);l.download=f;l.click();alert('✅ Export: '+f)}
+
+function exportGeneral(){const j=JSON.stringify(data,null,2);const l=document.createElement('a');l.href='data:application/json;charset=utf-8,'+encodeURIComponent(j);l.download='deuxchenes_'+new Date().toISOString().split('T')[0]+'.json';l.click();localStorage.setItem('deuxchenes_lastexport',Date.now());showNotification(`✅ Export réussi!
+${data.clients.length} clients
+${data.interventions.length} interventions
+${data.stocks.length} produits
+${data.personnel.length} employés`)}
+
+// Export automatique hebdomadaire
+function checkAutoExport(){
+    const lastExport=localStorage.getItem('deuxchenes_lastexport');
+    const now=Date.now();
+    const oneWeek=7*24*60*60*1000;
+    
+    if(!lastExport||now-parseInt(lastExport)>oneWeek){
+        setTimeout(()=>{
+            if(confirm('💾 Sauvegarde hebdomadaire recommandée!\n\nVoulez-vous exporter vos données maintenant?')){
+                exportGeneral();
+            }else{
+                localStorage.setItem('deuxchenes_lastexport',now);
+            }
+        },3000);
+    }
+}
+
+// Import de données JSON
+function importData(input){
+    if(!input.files||!input.files[0])return;
+    
+    const file=input.files[0];
+    const reader=new FileReader();
+    
+    reader.onload=function(e){
+        try{
+            const importedData=JSON.parse(e.target.result);
+            
+            if(!importedData.clients&&!importedData.interventions){
+                alert('❌ Fichier invalide');
+                return;
+            }
+            
+            if(confirm('⚠️ ATTENTION!\n\nImporter ces données va remplacer toutes vos données actuelles.\n\nÊtes-vous sûr de vouloir continuer?')){
+                data=importedData;
+                
+                // S'assurer que tous les champs existent
+                if(!data.produits)data.produits=[];
+                if(!data.clients)data.clients=[];
+                if(!data.interventions)data.interventions=[];
+                if(!data.stocks)data.stocks=[];
+                if(!data.personnel)data.personnel=[];
+                
+                saveData();
+                renderClients();
+                renderInterventions();
+                renderStocks();
+                renderPersonnel();
+                updateStats();
+                
+                showNotification('✅ Données importées avec succès!');
+            }
+        }catch(err){
+            alert('❌ Erreur lors de l\'import:\n'+err.message);
+        }finally{
+            input.value='';
+        }
+    };
+    
+    reader.readAsText(file);
+}
+
+// ========================================
+// FONCTIONS DE GÉNÉRATION PDF
+// ========================================
+
+// Génération PDF Clients
+function generatePDFClients() {
+    if (data.clients.length === 0) {
+        alert('Aucun client à exporter');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // En-tête
+    doc.setFillColor(114, 47, 55);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(212, 175, 55);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('Les Deux Chênes', 20, 20);
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Liste des Clients', 20, 30);
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text(`Édité le: ${new Date().toLocaleDateString('fr-FR')}`, 20, 50);
+    doc.text(`Total clients: ${data.clients.length}`, 20, 57);
+
+    // Tableau
+    const tableData = data.clients.map(c => [
+        c.nom,
+        c.tel || '-',
+        c.email || '-',
+        c.adresse || '-',
+        c.surface > 0 ? c.surface + ' ha' : '-'
+    ]);
+
+    doc.autoTable({
+        head: [['Nom', 'Téléphone', 'Email', 'Adresse', 'Surface']],
+        body: tableData,
+        startY: 65,
+        theme: 'grid',
+        headStyles: { fillColor: [114, 47, 55], textColor: [255, 255, 255], fontStyle: 'bold' },
+        styles: { fontSize: 9, cellPadding: 4 },
+        alternateRowStyles: { fillColor: [245, 245, 245] }
+    });
+
+    // Pied de page
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`Page ${i}/${pageCount} - Généré le ${new Date().toLocaleDateString('fr-FR')}`, 105, 290, { align: 'center' });
+    }
+
+    const filename = `clients_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+    showNotification('✅ PDF généré : ' + filename);
+}
+
+// Génération PDF Interventions avec sélection de dates
+function generatePDFInterventions(startDate, endDate) {
+    const filtered = data.interventions.filter(i => {
+        const date = new Date(i.date);
+        const start = startDate ? new Date(startDate) : new Date(0);
+        const end = endDate ? new Date(endDate) : new Date();
+        return date >= start && date <= end;
+    });
+
+    if (filtered.length === 0) {
+        alert('Aucune intervention dans cette période');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // En-tête
+    doc.setFillColor(114, 47, 55);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(212, 175, 55);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('Les Deux Chênes', 20, 20);
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Rapport d\'Interventions', 20, 30);
+
+    // Période
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    const dateStr = `Période: ${startDate || 'Début'} → ${endDate || 'Aujourd\'hui'}`;
+    doc.text(dateStr, 20, 50);
+
+    // Statistiques
+    const totalHeures = filtered.reduce((sum, i) => sum + (i.duree || 0), 0);
+    doc.text(`Total interventions: ${filtered.length}`, 20, 60);
+    doc.text(`Total heures: ${totalHeures}h`, 20, 65);
+
+    // Tableau
+    const tableData = filtered.map(i => [
+        new Date(i.date).toLocaleDateString('fr-FR'),
+        i.client,
+        i.parcelle,
+        i.type,
+        i.duree ? i.duree + 'h' : '-',
+        i.operateur,
+        i.statut
+    ]);
+
+    doc.autoTable({
+        head: [['Date', 'Client', 'Parcelle', 'Type', 'Durée', 'Opérateur', 'Statut']],
+        body: tableData,
+        startY: 75,
+        theme: 'grid',
+        headStyles: { fillColor: [114, 47, 55], textColor: [255, 255, 255], fontStyle: 'bold' },
+        styles: { fontSize: 8, cellPadding: 3 },
+        alternateRowStyles: { fillColor: [245, 245, 245] }
+    });
+
+    // Pied de page
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`Page ${i}/${pageCount} - Généré le ${new Date().toLocaleDateString('fr-FR')}`, 105, 290, { align: 'center' });
+    }
+
+    const filename = `interventions_${startDate || 'debut'}_${endDate || 'fin'}.pdf`;
+    doc.save(filename);
+    showNotification('✅ PDF généré : ' + filename);
+}
+
+// Génération PDF Stocks
+function generatePDFStocks() {
+    if (data.stocks.length === 0) {
+        alert('Aucun stock à exporter');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // En-tête
+    doc.setFillColor(114, 47, 55);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(212, 175, 55);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('Les Deux Chênes', 20, 20);
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255);
+    doc.text('État des Stocks Phytosanitaires', 20, 30);
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    doc.text(`Édité le: ${new Date().toLocaleDateString('fr-FR')}`, 20, 50);
+
+    // Alertes
+    const alertes = data.stocks.filter(s => s.quantite < s.seuil);
+    if (alertes.length > 0) {
+        doc.setFillColor(249, 115, 22);
+        doc.rect(20, 55, 170, 10, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.text(`⚠️ ${alertes.length} produit(s) en alerte stock bas`, 25, 62);
+    }
+
+    // Tableau
+    const tableData = data.stocks.map(s => [
+        s.client,
+        s.produit,
+        s.quantite.toString(),
+        s.unite,
+        s.seuil.toString(),
+        s.quantite < s.seuil ? '⚠️ BAS' : '✓ OK'
+    ]);
+
+    doc.autoTable({
+        head: [['Client', 'Produit', 'Quantité', 'Unité', 'Seuil', 'État']],
+        body: tableData,
+        startY: alertes.length > 0 ? 70 : 60,
+        theme: 'grid',
+        headStyles: { fillColor: [114, 47, 55], textColor: [255, 255, 255], fontStyle: 'bold' },
+        styles: { fontSize: 9, cellPadding: 4 },
+        alternateRowStyles: { fillColor: [245, 245, 245] },
+        didParseCell: function(data) {
+            if (data.column.index === 5 && data.cell.text[0].includes('BAS')) {
+                data.cell.styles.textColor = [249, 115, 22];
+                data.cell.styles.fontStyle = 'bold';
+            }
+        }
+    });
+
+    const finalY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Total produits: ${data.stocks.length}`, 20, finalY);
+    doc.text(`Produits en alerte: ${alertes.length}`, 20, finalY + 7);
+
+    const filename = `stocks_${new Date().toISOString().split('T')[0]}.pdf`;
+    doc.save(filename);
+    showNotification('✅ PDF généré : ' + filename);
+}
+
+// Génération PDF Heures Personnel avec RÉCAPITULATIF DES JOURS TRAVAILLÉS
+function generatePDFHeuresPersonnel(mois, annee) {
+    if (data.personnel.length === 0) {
+        alert('Aucun employé');
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // En-tête
+    doc.setFillColor(114, 47, 55);
+    doc.rect(0, 0, 210, 40, 'F');
+    doc.setTextColor(212, 175, 55);
+    doc.setFontSize(24);
+    doc.setFont(undefined, 'bold');
+    doc.text('Les Deux Chênes', 20, 20);
+    doc.setFontSize(12);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Relevé d\'Heures Personnel', 20, 30);
+
+    doc.setTextColor(0, 0, 0);
+    doc.setFontSize(10);
+    const periode = mois !== null && annee 
+        ? `${getMonthName(mois)} ${annee}`
+        : new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+    doc.text(`Période: ${periode}`, 20, 50);
+
+    let currentY = 60;
+
+    // Pour chaque employé
+    data.personnel.forEach((p, index) => {
+        if (index > 0) {
+            doc.addPage();
+            currentY = 20;
+        }
+
+        // Nom de l'employé
+        doc.setFontSize(14);
+        doc.setFont(undefined, 'bold');
+        doc.setTextColor(114, 47, 55);
+        doc.text(`${p.nom} - ${p.poste}`, 20, currentY);
+        currentY += 10;
+
+        // Récupérer les jours travaillés
+        const joursDetail = getJoursTravailles(p, mois, annee);
+        
+        if (joursDetail.length === 0) {
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text('Aucune heure enregistrée pour cette période', 20, currentY);
+            currentY += 10;
+        } else {
+            // Tableau récapitulatif des jours
+            const tableData = joursDetail.map(j => [
+                j.date,
+                j.arrivee || '-',
+                j.depart || '-',
+                j.heures.toFixed(1) + 'h',
+                j.type || 'Pointage'
+            ]);
+
+            doc.autoTable({
+                head: [['Date', 'Arrivée', 'Départ', 'Heures', 'Type']],
+                body: tableData,
+                startY: currentY,
+                theme: 'grid',
+                headStyles: { fillColor: [114, 47, 55], textColor: [255, 255, 255] },
+                styles: { fontSize: 9, cellPadding: 3 },
+                alternateRowStyles: { fillColor: [245, 245, 245] },
+                margin: { left: 20, right: 20 }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 10;
+        }
+
+        // Total heures
+        const totalHeures = joursDetail.reduce((sum, j) => sum + j.heures, 0);
+        doc.setFillColor(212, 175, 55);
+        doc.rect(20, currentY, 170, 12, 'F');
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text(`TOTAL: ${totalHeures.toFixed(1)} heures`, 25, currentY + 8);
+    });
+
+    // Pied de page sur toutes les pages
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`Page ${i}/${pageCount} - Généré le ${new Date().toLocaleDateString('fr-FR')}`, 105, 290, { align: 'center' });
+    }
+
+    const filename = `heures_personnel_${periode.replace(/ /g, '_')}.pdf`;
+    doc.save(filename);
+    showNotification('✅ PDF généré : ' + filename);
+}
+
+// Fonction pour obtenir le détail des jours travaillés
+function getJoursTravailles(person, month, year) {
+    const targetMonth = month !== null ? month : new Date().getMonth();
+    const targetYear = year || new Date().getFullYear();
+    const joursMap = new Map();
+
+    // Traiter les pointages (arrivée/départ)
+    const pointages = person.pointages || [];
+    let lastArrivee = null;
+    
+    pointages.forEach(pt => {
+        const d = new Date(pt.timestamp);
+        if (d.getMonth() === targetMonth && d.getFullYear() === targetYear) {
+            const dateKey = d.toLocaleDateString('fr-FR');
+            
+            if (pt.type === 'Arrivée') {
+                lastArrivee = { timestamp: pt.timestamp, time: pt.time };
+            } else if (pt.type === 'Départ' && lastArrivee) {
+                const heures = (pt.timestamp - lastArrivee.timestamp) / (1000 * 60 * 60);
+                
+                if (!joursMap.has(dateKey)) {
+                    joursMap.set(dateKey, {
+                        date: dateKey,
+                        arrivee: lastArrivee.time,
+                        depart: pt.time,
+                        heures: heures,
+                        type: 'Pointage'
+                    });
+                } else {
+                    joursMap.get(dateKey).heures += heures;
+                    joursMap.get(dateKey).depart = pt.time;
+                }
+                lastArrivee = null;
+            }
+        }
+    });
+
+    // Traiter les heures manuelles
+    const manualHours = person.manualHours || [];
+    manualHours.forEach(mh => {
+        const d = new Date(mh.date);
+        if (d.getMonth() === targetMonth && d.getFullYear() === targetYear) {
+            const dateKey = d.toLocaleDateString('fr-FR');
+            
+            if (!joursMap.has(dateKey)) {
+                joursMap.set(dateKey, {
+                    date: dateKey,
+                    arrivee: null,
+                    depart: null,
+                    heures: mh.hours,
+                    type: mh.task || 'Manuel'
+                });
+            } else {
+                joursMap.get(dateKey).heures += mh.hours;
+            }
+        }
+    });
+
+    // Convertir en tableau et trier par date
+    return Array.from(joursMap.values()).sort((a, b) => {
+        const dateA = new Date(a.date.split('/').reverse().join('-'));
+        const dateB = new Date(b.date.split('/').reverse().join('-'));
+        return dateA - dateB;
+    });
+}
+
+// Helper pour nom de mois
+function getMonthName(month) {
+    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    return months[month];
+}
+
+// Modal de sélection de dates pour interventions
+function showPDFInterventionsModal() {
+    const modal = document.createElement('div');
+    modal.className = 'modal show';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📄 Générer PDF Interventions</h2>
+                <button class="close" onclick="this.closest('.modal').remove()">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date de début</label>
+                <input type="date" class="form-input" id="pdfStartDate">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date de fin</label>
+                <input type="date" class="form-input" id="pdfEndDate" value="${new Date().toISOString().split('T')[0]}">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Annuler</button>
+                <button class="btn btn-primary" onclick="generatePDFInterventions(document.getElementById('pdfStartDate').value, document.getElementById('pdfEndDate').value); this.closest('.modal').remove();">Générer</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Modal de sélection mois/année pour personnel
+function showPDFPersonnelModal() {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal show';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📄 Générer PDF Heures Personnel</h2>
+                <button class="close" onclick="this.closest('.modal').remove()">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mois</label>
+                <select class="form-select" id="pdfMonth">
+                    <option value="0">Janvier</option>
+                    <option value="1">Février</option>
+                    <option value="2">Mars</option>
+                    <option value="3">Avril</option>
+                    <option value="4">Mai</option>
+                    <option value="5">Juin</option>
+                    <option value="6">Juillet</option>
+                    <option value="7">Août</option>
+                    <option value="8">Septembre</option>
+                    <option value="9">Octobre</option>
+                    <option value="10">Novembre</option>
+                    <option value="11">Décembre</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Année</label>
+                <input type="number" class="form-input" id="pdfYear" value="${currentYear}">
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Annuler</button>
+                <button class="btn btn-primary" onclick="generatePDFHeuresPersonnel(parseInt(document.getElementById('pdfMonth').value), parseInt(document.getElementById('pdfYear').value)); this.closest('.modal').remove();">Générer</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('pdfMonth').value = currentMonth;
+}
+
+// Notification
+function showNotification(message) {
+    const notif = document.createElement('div');
+    notif.style.cssText = 'position:fixed;top:80px;right:20px;background:#10B981;color:white;padding:1rem;border-radius:8px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+    notif.textContent = message;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 3000);
+}
+
+// ========================================
+// FIN DES FONCTIONS PDF
+// ========================================
+
+// INIT
+async function initApp(){
+    await loadData();
+    
+    // Initialiser produits par défaut si besoin
+    if(!data.produits||data.produits.length===0){
+        data.produits=[
+            {id:1,nom:'Citrothiol',dose:'',photo:'',lastModified:Date.now()},
+            {id:2,nom:'Héliocuivre',dose:'1.5 L/ha',photo:'heliocuivre.webp',lastModified:Date.now()},
+            {id:3,nom:'Fluidosoufre',dose:'',photo:'',lastModified:Date.now()}
+        ];
+        saveData();
+    }
+    
+    renderClients();
+    renderInterventions();
+    renderStocks();
+    renderPersonnel();
+    updateStats();
+    
+    // Démarrer auto-sync si mode synchro
+    if(syncMode==='sync'){
+        startAutoSync();
+        updateSyncStatus('online','Synchronisé');
+    }else{
+        updateSyncStatus('local','Mode local');
+    }
+    
+    // Vérifier et proposer export automatique
+    checkAutoExport();
+}
+initApp();
+</script>
+</body>
+</html>
