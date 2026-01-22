@@ -1,0 +1,210 @@
+/* ========================================
+   STYLES POUR LA GESTION DES DOCUMENTS
+   ======================================== */
+
+.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.document-card {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.document-card:hover {
+  transform: translateY(-2px);
+  border-color: #D4AF37;
+}
+
+.document-preview {
+  width: 100%;
+  height: 180px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.document-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.document-icon {
+  font-size: 4rem;
+  opacity: 0.5;
+}
+
+.document-info {
+  padding: 1rem;
+}
+
+.document-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.document-name:hover {
+  color: #D4AF37;
+}
+
+.document-meta {
+  font-size: 0.85rem;
+  color: #9CA3AF;
+  margin-bottom: 0.25rem;
+}
+
+.document-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.document-actions .icon-btn {
+  flex: 1;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 1.2rem;
+  transition: all 0.2s ease;
+}
+
+.document-actions .icon-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #D4AF37;
+  transform: scale(1.05);
+}
+
+/* Filtres de documents */
+.documents-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.documents-filters select,
+.documents-filters input {
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Types de documents avec couleurs */
+.doc-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Stats documents */
+.documents-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.document-stat-card {
+  background: rgba(0, 0, 0, 0.8);
+  border-left: 4px solid;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.document-stat-card.analyse {
+  border-left-color: #3B82F6;
+}
+
+.document-stat-card.certificat {
+  border-left-color: #10B981;
+}
+
+.document-stat-card.facture {
+  border-left-color: #F59E0B;
+}
+
+.document-stat-card.autre {
+  border-left-color: #6B7280;
+}
+
+.document-stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.document-stat-label {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+}
+
+/* Drag & Drop */
+.document-dropzone {
+  border: 2px dashed rgba(212, 175, 55, 0.5);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.document-dropzone:hover,
+.document-dropzone.dragover {
+  border-color: #D4AF37;
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.document-dropzone-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.document-dropzone-text {
+  color: #9CA3AF;
+  margin-bottom: 0.5rem;
+}
+
+.document-dropzone-hint {
+  font-size: 0.8rem;
+  color: #6B7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .documents-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .documents-filters {
+    flex-direction: column;
+  }
+
+  .documents-filters select,
+  .documents-filters input {
+    width: 100%;
+  }
+}
