@@ -1,0 +1,343 @@
+<!-- ========================================
+ÉCRAN DE CONNEXION
+Les Deux Chênes
+======================================== -->
+
+<!-- Style pour l'écran de connexion -->
+<style>
+#login-screen {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('background.webp') center/cover fixed;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.login-container {
+  background: linear-gradient(135deg, #2d1b1b 0%, #1a1a1a 100%);
+  border: 2px solid #722F37;
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-logo img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: white;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.login-title {
+  text-align: center;
+  color: #D4AF37;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: #9CA3AF;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.login-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.login-label {
+  display: block;
+  color: #9CA3AF;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.login-input {
+  width: 100%;
+  padding: 0.875rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #722F37;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.login-btn {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #722F37 0%, #8B4049 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  margin-top: 1rem;
+}
+
+.login-btn:hover {
+  transform: translateY(-2px);
+}
+
+.login-btn:active {
+  transform: scale(0.98);
+}
+
+.login-error {
+  display: none;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #EF4444;
+  color: #FCA5A5;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.login-info {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.login-info-title {
+  color: #D4AF37;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.login-credentials {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.login-credentials-label {
+  color: #9CA3AF;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.login-credentials-value {
+  color: #D4AF37;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.login-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid #F59E0B;
+  color: #FCD34D;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* Bouton déconnexion dans le header */
+.logout-btn {
+  background: rgba(239, 68, 68, 0.2);
+  color: #FCA5A5;
+  border: 1px solid #EF4444;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+#current-user-display {
+  color: #D4AF37;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 6px;
+}
+</style>
+
+<!-- Écran de connexion -->
+<div id="login-screen">
+  <div class="login-container">
+    <div class="login-logo">
+      <img src="logo.png" alt="Les Deux Chênes">
+    </div>
+
+    <h1 class="login-title">Les Deux Chênes</h1>
+    <p class="login-subtitle">Connectez-vous pour accéder à l'application</p>
+
+    <div id="login-error" class="login-error"></div>
+
+    <form onsubmit="handleLoginSubmit(event)" autocomplete="off">
+      <div class="login-form-group">
+        <label class="login-label">Nom d'utilisateur</label>
+        <input
+          type="text"
+          id="login-username"
+          class="login-input"
+          placeholder="Entrez votre identifiant"
+          required
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="login-form-group">
+        <label class="login-label">Mot de passe</label>
+        <input
+          type="password"
+          id="login-password"
+          class="login-input"
+          placeholder="Entrez votre mot de passe"
+          required
+          autocomplete="off"
+        >
+      </div>
+
+      <button type="submit" class="login-btn">
+        🔐 Se connecter
+      </button>
+    </form>
+
+    <!-- Aide pour la démo -->
+    <div class="login-info">
+      <div class="login-info-title">📝 Comptes de démonstration :</div>
+
+      <div class="login-credentials">
+        <span class="login-credentials-label">👔 Administrateur :</span><br>
+        <span class="login-credentials-value">admin / admin123</span>
+      </div>
+
+      <div class="login-credentials">
+        <span class="login-credentials-label">👨‍🌾 Chef de cave :</span><br>
+        <span class="login-credentials-value">chef / chef123</span>
+      </div>
+
+      <div class="login-credentials">
+        <span class="login-credentials-label">👷 Ouvrier :</span><br>
+        <span class="login-credentials-value">ouvrier / ouvrier123</span>
+      </div>
+
+      <div class="login-warning">
+        ⚠️ Changez ces mots de passe dès votre première connexion !
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section Utilisateurs (visible seulement pour les admins) -->
+<div id="users" class="section">
+  <div class="page-header">
+    <h1 class="page-title">👥 Gestion des utilisateurs</h1>
+    <div class="btn-group">
+      <button class="btn" onclick="showModal('modalUser')">+ Nouvel utilisateur</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>Utilisateur</th>
+            <th>Rôle</th>
+            <th>Email</th>
+            <th>Dernière connexion</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableUsers">
+          <!-- Rempli par JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Utilisateur -->
+<div id="modalUser" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalUserTitle">Nouvel utilisateur</h2>
+      <button class="close" onclick="hideModal('modalUser')">×</button>
+    </div>
+
+    <input type="hidden" id="userId">
+
+    <div class="form-group">
+      <label class="form-label">Nom complet *</label>
+      <input type="text" class="form-input" id="userNom" placeholder="Ex: Jean Dupont" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Nom d'utilisateur * (pour se connecter)</label>
+      <input type="text" class="form-input" id="userUsername" placeholder="Ex: jdupont" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Mot de passe *</label>
+      <input type="password" class="form-input" id="userPassword" placeholder="Minimum 6 caractères" required>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="userEmail" placeholder="jean.dupont@example.com">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Rôle *</label>
+      <select class="form-select" id="userRole">
+        <option value="OUVRIER">👷 Ouvrier (lecture + pointage)</option>
+        <option value="CHEF_CAVE">👨‍🌾 Chef de cave (gestion complète)</option>
+        <option value="ADMIN">👔 Administrateur (tous les droits)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        <input type="checkbox" id="userActif" checked style="width:auto;margin-right:0.5rem">
+        Compte actif
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="hideModal('modalUser')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveUser()">Enregistrer</button>
+    </div>
+  </div>
+</div>
