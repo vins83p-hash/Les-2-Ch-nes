@@ -237,26 +237,65 @@ Organisation claire et sécurisée.
 
 ---
 
+## ✅ NOUVEAU : Exports réglementaires 📜
+
+### 5 types d'exports pour les contrôles officiels !
+
+**1. 📋 Registre phytosanitaire** (DGCCRF obligatoire)
+- Liste de TOUS vos traitements
+- Format conforme réglementation française
+- Avec date, produit, dose, parcelle, météo
+
+**2. 📦 Inventaire des stocks phyto**
+- Tous vos produits en stock
+- Quantités actuelles
+- Alertes si stock bas
+
+**3. 👷 Registre du personnel**
+- Heures travaillées par employé
+- Pour MSA et URSSAF
+- Export par période (mois, année...)
+
+**4. 🚜 Déclaration de récolte**
+- Vendanges par client
+- Rendement à l'hectare
+- Pour AOP et Douanes
+
+**5. 📜 Dossier complet AOP**
+- Traçabilité complète de l'année
+- Conforme cahier des charges AOP
+- Parcellaire + traitements + interventions
+
+### 🚀 Comment l'utiliser
+
+1. Cliquez sur **"📜 Exports réglementaires"** (en haut de l'app)
+2. Choisissez le type d'export
+3. Le fichier se télécharge automatiquement
+4. Conservez-le pour les contrôles (5 ans minimum)
+
+**Guide complet :** GUIDE-EXPORTS-REGLEMENTAIRES.md
+
+---
+
 ## 🔄 Prochaines étapes
 
-Maintenant que le système d'utilisateurs est en place, on va ajouter :
+Maintenant que les utilisateurs et les exports sont en place, on va ajouter :
 
-1. **📜 Export réglementaire** (AOP, DGCCRF)
-   - Pour les contrôles officiels
-   - Registre phytosanitaire conforme
+1. **🗂️ Gestion des documents** ← EN COURS
+   - Upload d'analyses de labo
+   - Stocker certificats Bio/HVE/AOP
+   - Documents par client/parcelle
+   - Intégration Google Drive
 
-2. **🗂️ Gestion des documents**
-   - Ajouter analyses de labo
-   - Stocker certificats
-   - Tout centraliser
-
-3. **📍 Cartographie avancée**
+2. **📍 Cartographie avancée**
    - Dessiner les parcelles sur la carte
    - Calcul automatique des surfaces
+   - Géolocalisation des interventions
 
-4. **🔄 Assemblage des vins**
+3. **🔄 Assemblage des vins**
    - Mélanger plusieurs cuves
-   - Calculs automatiques
+   - Calculs automatiques (degré, acidité...)
+   - Validation AOP
 
 ---
 
@@ -265,7 +304,8 @@ Maintenant que le système d'utilisateurs est en place, on va ajouter :
 - **README.md** : Vue d'ensemble du projet
 - **INSTALLATION.md** : Comment installer
 - **QUICKSTART.md** : Démarrage rapide (5 min)
-- **GUIDE-UTILISATEURS.md** : Tout sur les utilisateurs ← **LISEZ CELUI-CI !**
+- **GUIDE-UTILISATEURS.md** : Tout sur les utilisateurs ← **À LIRE !**
+- **GUIDE-EXPORTS-REGLEMENTAIRES.md** : Tout sur les exports ← **NOUVEAU !**
 - **ROADMAP.md** : Fonctionnalités futures
 - **CONTRIBUTING.md** : Pour les développeurs
 
@@ -273,6 +313,7 @@ Maintenant que le système d'utilisateurs est en place, on va ajouter :
 
 ## ✅ Checklist avant de commencer
 
+### Sécurité
 - [ ] J'ai lu le GUIDE-UTILISATEURS.md
 - [ ] Je me suis connecté avec admin/admin123
 - [ ] J'ai changé TOUS les mots de passe par défaut
@@ -280,8 +321,15 @@ Maintenant que le système d'utilisateurs est en place, on va ajouter :
 - [ ] J'ai testé la connexion avec chaque compte
 - [ ] J'ai expliqué à mes employés comment se connecter
 
+### Conformité réglementaire
+- [ ] J'ai lu le GUIDE-EXPORTS-REGLEMENTAIRES.md
+- [ ] J'ai testé l'export du registre phytosanitaire
+- [ ] J'ai vérifié que mes données sont complètes
+- [ ] J'ai créé un dossier pour conserver mes exports
+- [ ] Je sais comment exporter avant un contrôle
+
 ---
 
-**C'est parti ! Votre application est maintenant sécurisée ! 🔐**
+**C'est parti ! Votre application est sécurisée ET conforme ! 🔐📜**
 
-**Prochaine fonctionnalité en cours de développement : Export réglementaire 📜**
+**Prochaine fonctionnalité en développement : Gestion des documents 🗂️**
