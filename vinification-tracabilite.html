@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les Deux Chênes - Vinification & Traçabilité</title>
+    <meta name="description" content="Vinification et traçabilité des vins">
+    <meta name="theme-color" content="#F4E4E6">
+    <link rel="manifest" href="manifest-cave.json">
+
+    <style>
+        /* ===== DESIGN INSPIRÉ DOMAINES OTT ===== */
+
+        :root {
+            --rose-pale: #F4E4E6;
+            --beige: #E8DDD0;
+            --or-rose: #D4A5A5;
+            --blanc-casse: #FAF8F5;
+            --texte: #2D2424;
+            --texte-light: #6B5E5E;
+            --bordeaux: #8B6B6B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--blanc-casse);
+            color: var(--texte);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        /* ===== HEADER ===== */
+
+        .header {
+            background: linear-gradient(135deg, var(--rose-pale) 0%, var(--beige) 100%);
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--or-rose);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--texte);
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: var(--texte-light);
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        /* ===== NAVIGATION ===== */
+
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid var(--or-rose);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+            overflow-x: auto;
+        }
+
+        .nav-tabs {
+            display: flex;
+            padding: 0.5rem;
+            min-width: max-content;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem 0.5rem;
+            background: none;
+            border: none;
+            color: var(--texte-light);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: var(--rose-pale);
+            color: var(--texte);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--or-rose) 0%, var(--bordeaux) 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        /* ===== CONTAINER ===== */
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== PAGE HEADER ===== */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--bordeaux);
+            letter-spacing: 2px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* ===== BOUTONS ===== */
+
+        .btn {
+            background: linear-gradient(135deg, var(--or-rose) 0%, var(--bordeaux) 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(212, 165, 165, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 165, 165, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--beige);
+            color: var(--texte);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        /* ===== CARTES ===== */
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            border: 1px solid var(--rose-pale);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--bordeaux);
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* ===== STATS ===== */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--rose-pale) 0%, var(--beige) 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--or-rose);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--texte-light);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--bordeaux);
+        }
+
+        .stat-unit {
+            font-size: 1rem;
+            color: var(--texte-light);
+            margin-left: 0.25rem;
+        }
+
+        /* ===== FORMULAIRES ===== */
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--texte);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input,
+        .form-select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--rose-pale);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--texte);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--or-rose);
+            box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        /* ===== TABLE ===== */
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--or-rose) 0%, var(--bordeaux) 100%);
+            color: white;
+            padding: 1rem 0.75rem;
+            text-align: left;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid var(--rose-pale);
+        }
+
+        tr:hover {
+            background: var(--blanc-casse);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* ===== MODAL ===== */
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(45, 36, 36, 0.85);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 3px solid var(--or-rose);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--rose-pale);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--bordeaux);
+            letter-spacing: 1px;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--texte-light);
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            background: var(--rose-pale);
+            color: var(--bordeaux);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: flex-end;
+        }
+
+        /* ===== BADGES ===== */
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-rouge {
+            background: #FFE5E5;
+            color: #B91C1C;
+        }
+
+        .badge-rose {
+            background: #FFE5F0;
+            color: #BE185D;
+        }
+
+        .badge-blanc {
+            background: #F3F4F6;
+            color: #374151;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-danger {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        /* ===== CUVE VISUELLE ===== */
+
+        .cuve-visual {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to bottom, var(--blanc-casse) 0%, var(--rose-pale) 100%);
+            border: 3px solid var(--bordeaux);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .cuve-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to bottom, #8B6B6B 0%, #B91C1C 100%);
+            transition: height 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .cuve-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .cuve-info-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--blanc-casse);
+            border-radius: 10px;
+            border: 1px solid var(--rose-pale);
+        }
+
+        .cuve-info-label {
+            font-size: 0.8rem;
+            color: var(--texte-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .cuve-info-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--bordeaux);
+        }
+
+        /* ===== TIMELINE ===== */
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--or-rose);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.5rem;
+            top: 0.25rem;
+            width: 12px;
+            height: 12px;
+            background: var(--bordeaux);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px var(--or-rose);
+        }
+
+        .timeline-date {
+            font-size: 0.85rem;
+            color: var(--texte-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--rose-pale);
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--bordeaux);
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== LISTE LOTS ===== */
+
+        .lots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .lot-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid var(--rose-pale);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lot-card:hover {
+            border-color: var(--or-rose);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .lot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .lot-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--bordeaux);
+        }
+
+        .lot-info {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--rose-pale);
+        }
+
+        .lot-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .lot-info-label {
+            color: var(--texte-light);
+        }
+
+        .lot-info-value {
+            font-weight: 600;
+            color: var(--texte);
+        }
+
+        /* ===== RESPONSIVE ===== */
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .lots-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== UTILITAIRES ===== */
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 {
+            margin-top: 1rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--texte-light);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>LES DEUX CHÊNES</h1>
+    <p class="subtitle">Vinification & Traçabilité</p>
+</div>
+
+<div class="nav">
+    <div class="nav-tabs">
+        <button class="tab active" onclick="changeTab('dashboard')">📊 Dashboard</button>
+        <button class="tab" onclick="changeTab('lots')">🍇 Lots</button>
+        <button class="tab" onclick="changeTab('cuves')">🛢️ Cuves</button>
+        <button class="tab" onclick="changeTab('operations')">⚙️ Opérations</button>
+        <button class="tab" onclick="changeTab('analyses')">🔬 Analyses</button>
+        <button class="tab" onclick="changeTab('assemblages')">🔄 Assemblages</button>
+        <button class="tab" onclick="changeTab('tracabilite')">📋 Traçabilité</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="section active">
+        <div class="page-header">
+            <h2 class="page-title">Tableau de bord</h2>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Lots actifs</div>
+                <div class="stat-value" id="statLots">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Volume total</div>
+                <div class="stat-value" id="statVolume">0<span class="stat-unit">L</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Cuves occupées</div>
+                <div class="stat-value" id="statCuves">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Opérations récentes</div>
+                <div class="stat-value" id="statOperations">0</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">📅 Dernières opérations</h3>
+            <div id="dashRecentOperations" class="empty-state">
+                <div class="empty-state-icon">⚙️</div>
+                <p>Aucune opération enregistrée</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">🍇 Lots en cours de vinification</h3>
+            <div id="dashLotsEnCours" class="empty-state">
+                <div class="empty-state-icon">🍇</div>
+                <p>Aucun lot en vinification</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOTS -->
+    <div id="lots" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Lots de vin</h2>
+            <div class="btn-group">
+                <button class="btn" onclick="exportData('lots')">📥 Export CSV</button>
+                <button class="btn" onclick="openModalLot()">+ Nouveau lot</button>
+            </div>
+        </div>
+
+        <div id="lotsContent" class="lots-grid"></div>
+    </div>
+
+    <!-- CUVES -->
+    <div id="cuves" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Cuves</h2>
+            <button class="btn" onclick="openModalCuve()">+ Nouvelle cuve</button>
+        </div>
+
+        <div id="cuvesContent"></div>
+    </div>
+
+    <!-- OPÉRATIONS -->
+    <div id="operations" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Opérations de cave</h2>
+            <button class="btn" onclick="openModalOperation()">+ Nouvelle opération</button>
+        </div>
+
+        <div class="card">
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Cuve / Lot</th>
+                            <th>Détails</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="operationsTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANALYSES -->
+    <div id="analyses" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Analyses œnologiques</h2>
+            <button class="btn" onclick="openModalAnalyse()">+ Nouvelle analyse</button>
+        </div>
+
+        <div class="card">
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Lot / Cuve</th>
+                            <th>Densité</th>
+                            <th>Alcool</th>
+                            <th>SO₂</th>
+                            <th>pH</th>
+                            <th>Acidité</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analysesTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ASSEMBLAGES -->
+    <div id="assemblages" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Assemblages</h2>
+            <button class="btn" onclick="openModalAssemblage()">+ Nouvel assemblage</button>
+        </div>
+
+        <div id="assemblagesContent"></div>
+    </div>
+
+    <!-- TRAÇABILITÉ -->
+    <div id="tracabilite" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Traçabilité</h2>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label class="form-label">Sélectionner un lot pour voir son historique</label>
+                <select class="form-select" id="tracabiliteSelectLot" onchange="afficherTracabilite()">
+                    <option value="">-- Choisir un lot --</option>
+                </select>
+            </div>
+
+            <div id="tracabiliteContent"></div>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL LOT -->
+<div id="modalLot" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Nouveau lot de raisin</h2>
+            <button class="close" onclick="closeModal('modalLot')">×</button>
+        </div>
+        <form onsubmit="saveLot(event)">
+            <input type="hidden" id="lotId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nom du lot *</label>
+                    <input type="text" class="form-input" id="lotNom" required placeholder="Ex: Syrah Parcelle Nord 2024">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Millésime *</label>
+                    <input type="number" class="form-input" id="lotMillesime" required value="2024">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Type de vin *</label>
+                    <select class="form-select" id="lotType" required>
+                        <option value="">-- Choisir --</option>
+                        <option value="rouge">Rouge</option>
+                        <option value="rose">Rosé</option>
+                        <option value="blanc">Blanc</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Cépage principal *</label>
+                    <input type="text" class="form-input" id="lotCepage" required placeholder="Ex: Syrah, Grenache...">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Parcelle d'origine</label>
+                    <input type="text" class="form-input" id="lotParcelle" placeholder="Ex: Parcelle Nord">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date de récolte</label>
+                    <input type="date" class="form-input" id="lotDateRecolte">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Poids raisin (kg)</label>
+                    <input type="number" step="0.1" class="form-input" id="lotPoidsRaisin" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Volume estimé (L)</label>
+                    <input type="number" step="1" class="form-input" id="lotVolume" placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Degré initial (°)</label>
+                    <input type="number" step="0.1" class="form-input" id="lotDegre" placeholder="0.0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">pH initial</label>
+                    <input type="number" step="0.01" class="form-input" id="lotPh" placeholder="0.00">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea class="form-input" id="lotNotes" placeholder="Observations, remarques..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalLot')">Annuler</button>
+                <button type="submit" class="btn">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL CUVE -->
+<div id="modalCuve" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Nouvelle cuve</h2>
+            <button class="close" onclick="closeModal('modalCuve')">×</button>
+        </div>
+        <form onsubmit="saveCuve(event)">
+            <input type="hidden" id="cuveId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Nom de la cuve *</label>
+                    <input type="text" class="form-input" id="cuveNom" required placeholder="Ex: Cuve 1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Capacité (L) *</label>
+                    <input type="number" step="1" class="form-input" id="cuveCapacite" required placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Type de cuve</label>
+                    <select class="form-select" id="cuveTypeCuve">
+                        <option value="inox">Inox</option>
+                        <option value="beton">Béton</option>
+                        <option value="bois">Bois</option>
+                        <option value="plastique">Plastique</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lot contenu</label>
+                    <select class="form-select" id="cuveLot">
+                        <option value="">-- Vide --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Volume actuel (L)</label>
+                    <input type="number" step="1" class="form-input" id="cuveVolumeActuel" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Température (°C)</label>
+                    <input type="number" step="0.1" class="form-input" id="cuveTemperature" placeholder="0.0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea class="form-input" id="cuveNotes" placeholder="Observations..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalCuve')">Annuler</button>
+                <button type="submit" class="btn">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL OPÉRATION -->
+<div id="modalOperation" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Nouvelle opération</h2>
+            <button class="close" onclick="closeModal('modalOperation')">×</button>
+        </div>
+        <form onsubmit="saveOperation(event)">
+            <input type="hidden" id="operationId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Date *</label>
+                    <input type="date" class="form-input" id="operationDate" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type d'opération *</label>
+                    <select class="form-select" id="operationType" required>
+                        <option value="">-- Choisir --</option>
+                        <option value="remontage">Remontage</option>
+                        <option value="pigeage">Pigeage</option>
+                        <option value="sulfitage">Sulfitage</option>
+                        <option value="levurage">Levurage</option>
+                        <option value="chaptalisation">Chaptalisation</option>
+                        <option value="soutirage">Soutirage</option>
+                        <option value="decuvage">Décuvage</option>
+                        <option value="pressurage">Pressurage</option>
+                        <option value="collage">Collage</option>
+                        <option value="filtration">Filtration</option>
+                        <option value="transfert">Transfert</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Cuve / Lot concerné *</label>
+                <select class="form-select" id="operationCuve" required>
+                    <option value="">-- Choisir --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Détails de l'opération</label>
+                <textarea class="form-input" id="operationDetails" placeholder="Durée, quantités, observations..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalOperation')">Annuler</button>
+                <button type="submit" class="btn">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ANALYSE -->
+<div id="modalAnalyse" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Nouvelle analyse</h2>
+            <button class="close" onclick="closeModal('modalAnalyse')">×</button>
+        </div>
+        <form onsubmit="saveAnalyse(event)">
+            <input type="hidden" id="analyseId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Date *</label>
+                    <input type="date" class="form-input" id="analyseDate" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lot / Cuve *</label>
+                    <select class="form-select" id="analyseLot" required>
+                        <option value="">-- Choisir --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Densité</label>
+                    <input type="number" step="0.001" class="form-input" id="analyseDensite" placeholder="1.000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Alcool (% vol)</label>
+                    <input type="number" step="0.1" class="form-input" id="analyseAlcool" placeholder="0.0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">SO₂ libre (mg/L)</label>
+                    <input type="number" step="1" class="form-input" id="analyseSo2Libre" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">SO₂ total (mg/L)</label>
+                    <input type="number" step="1" class="form-input" id="analyseSo2Total" placeholder="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">pH</label>
+                    <input type="number" step="0.01" class="form-input" id="analysePh" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Acidité totale (g/L H₂SO₄)</label>
+                    <input type="number" step="0.1" class="form-input" id="analyseAcidite" placeholder="0.0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Observations</label>
+                <textarea class="form-input" id="analyseNotes" placeholder="Couleur, arômes, remarques..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalAnalyse')">Annuler</button>
+                <button type="submit" class="btn">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL ASSEMBLAGE -->
+<div id="modalAssemblage" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Nouvel assemblage</h2>
+            <button class="close" onclick="closeModal('modalAssemblage')">×</button>
+        </div>
+        <form onsubmit="saveAssemblage(event)">
+            <input type="hidden" id="assemblageId">
+
+            <div class="form-group">
+                <label class="form-label">Nom de l'assemblage *</label>
+                <input type="text" class="form-input" id="assemblageNom" required placeholder="Ex: Cuvée Tradition 2024">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Type de vin</label>
+                    <select class="form-select" id="assemblageType">
+                        <option value="rouge">Rouge</option>
+                        <option value="rose">Rosé</option>
+                        <option value="blanc">Blanc</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date d'assemblage</label>
+                    <input type="date" class="form-input" id="assemblageDate">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Composition (un lot par ligne avec %)</label>
+                <textarea class="form-input" id="assemblageComposition" placeholder="Lot 1 : 60%&#10;Lot 2 : 40%"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Volume total (L)</label>
+                <input type="number" step="1" class="form-input" id="assemblageVolume" placeholder="0">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea class="form-input" id="assemblageNotes" placeholder="Description, objectif de l'assemblage..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('modalAssemblage')">Annuler</button>
+                <button type="submit" class="btn">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// ===== DONNÉES =====
+
+let data = {
+    lots: [],
+    cuves: [],
+    operations: [],
+    analyses: [],
+    assemblages: []
+};
+
+// ===== NAVIGATION =====
+
+function changeTab(tabName) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+
+    render();
+}
+
+// ===== MODAL =====
+
+function openModalLot(id = null) {
+    if (id) {
+        const lot = data.lots.find(l => l.id === id);
+        if (lot) {
+            document.getElementById('lotId').value = lot.id;
+            document.getElementById('lotNom').value = lot.nom;
+            document.getElementById('lotMillesime').value = lot.millesime;
+            document.getElementById('lotType').value = lot.type;
+            document.getElementById('lotCepage').value = lot.cepage;
+            document.getElementById('lotParcelle').value = lot.parcelle || '';
+            document.getElementById('lotDateRecolte').value = lot.dateRecolte || '';
+            document.getElementById('lotPoidsRaisin').value = lot.poidsRaisin || '';
+            document.getElementById('lotVolume').value = lot.volume || '';
+            document.getElementById('lotDegre').value = lot.degre || '';
+            document.getElementById('lotPh').value = lot.ph || '';
+            document.getElementById('lotNotes').value = lot.notes || '';
+        }
+    } else {
+        document.getElementById('lotId').value = '';
+        document.querySelector('#modalLot form').reset();
+        document.getElementById('lotMillesime').value = new Date().getFullYear();
+    }
+    showModal('modalLot');
+}
+
+function openModalCuve(id = null) {
+    populateSelectLots('cuveLot');
+
+    if (id) {
+        const cuve = data.cuves.find(c => c.id === id);
+        if (cuve) {
+            document.getElementById('cuveId').value = cuve.id;
+            document.getElementById('cuveNom').value = cuve.nom;
+            document.getElementById('cuveCapacite').value = cuve.capacite;
+            document.getElementById('cuveTypeCuve').value = cuve.typeCuve || 'inox';
+            document.getElementById('cuveLot').value = cuve.lotId || '';
+            document.getElementById('cuveVolumeActuel').value = cuve.volumeActuel || '';
+            document.getElementById('cuveTemperature').value = cuve.temperature || '';
+            document.getElementById('cuveNotes').value = cuve.notes || '';
+        }
+    } else {
+        document.getElementById('cuveId').value = '';
+        document.querySelector('#modalCuve form').reset();
+    }
+    showModal('modalCuve');
+}
+
+function openModalOperation(id = null) {
+    populateSelectCuves('operationCuve');
+
+    if (id) {
+        const op = data.operations.find(o => o.id === id);
+        if (op) {
+            document.getElementById('operationId').value = op.id;
+            document.getElementById('operationDate').value = op.date;
+            document.getElementById('operationType').value = op.type;
+            document.getElementById('operationCuve').value = op.cuveId;
+            document.getElementById('operationDetails').value = op.details || '';
+        }
+    } else {
+        document.getElementById('operationId').value = '';
+        document.querySelector('#modalOperation form').reset();
+        document.getElementById('operationDate').value = new Date().toISOString().split('T')[0];
+    }
+    showModal('modalOperation');
+}
+
+function openModalAnalyse(id = null) {
+    populateSelectCuves('analyseLot');
+
+    if (id) {
+        const analyse = data.analyses.find(a => a.id === id);
+        if (analyse) {
+            document.getElementById('analyseId').value = analyse.id;
+            document.getElementById('analyseDate').value = analyse.date;
+            document.getElementById('analyseLot').value = analyse.lotId;
+            document.getElementById('analyseDensite').value = analyse.densite || '';
+            document.getElementById('analyseAlcool').value = analyse.alcool || '';
+            document.getElementById('analyseSo2Libre').value = analyse.so2Libre || '';
+            document.getElementById('analyseSo2Total').value = analyse.so2Total || '';
+            document.getElementById('analysePh').value = analyse.ph || '';
+            document.getElementById('analyseAcidite').value = analyse.acidite || '';
+            document.getElementById('analyseNotes').value = analyse.notes || '';
+        }
+    } else {
+        document.getElementById('analyseId').value = '';
+        document.querySelector('#modalAnalyse form').reset();
+        document.getElementById('analyseDate').value = new Date().toISOString().split('T')[0];
+    }
+    showModal('modalAnalyse');
+}
+
+function openModalAssemblage(id = null) {
+    if (id) {
+        const ass = data.assemblages.find(a => a.id === id);
+        if (ass) {
+            document.getElementById('assemblageId').value = ass.id;
+            document.getElementById('assemblageNom').value = ass.nom;
+            document.getElementById('assemblageType').value = ass.type;
+            document.getElementById('assemblageDate').value = ass.date || '';
+            document.getElementById('assemblageComposition').value = ass.composition || '';
+            document.getElementById('assemblageVolume').value = ass.volume || '';
+            document.getElementById('assemblageNotes').value = ass.notes || '';
+        }
+    } else {
+        document.getElementById('assemblageId').value = '';
+        document.querySelector('#modalAssemblage form').reset();
+        document.getElementById('assemblageDate').value = new Date().toISOString().split('T')[0];
+    }
+    showModal('modalAssemblage');
+}
+
+function showModal(modalId) {
+    document.getElementById(modalId).classList.add('show');
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
+}
+
+// ===== SAUVEGARDE =====
+
+function saveLot(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('lotId').value || Date.now().toString();
+    const lot = {
+        id: id,
+        nom: document.getElementById('lotNom').value,
+        millesime: document.getElementById('lotMillesime').value,
+        type: document.getElementById('lotType').value,
+        cepage: document.getElementById('lotCepage').value,
+        parcelle: document.getElementById('lotParcelle').value,
+        dateRecolte: document.getElementById('lotDateRecolte').value,
+        poidsRaisin: parseFloat(document.getElementById('lotPoidsRaisin').value) || 0,
+        volume: parseFloat(document.getElementById('lotVolume').value) || 0,
+        degre: parseFloat(document.getElementById('lotDegre').value) || 0,
+        ph: parseFloat(document.getElementById('lotPh').value) || 0,
+        notes: document.getElementById('lotNotes').value,
+        dateCreation: new Date().toISOString()
+    };
+
+    const index = data.lots.findIndex(l => l.id === id);
+    if (index >= 0) {
+        data.lots[index] = lot;
+    } else {
+        data.lots.push(lot);
+    }
+
+    saveData();
+    closeModal('modalLot');
+    render();
+}
+
+function saveCuve(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('cuveId').value || Date.now().toString();
+    const cuve = {
+        id: id,
+        nom: document.getElementById('cuveNom').value,
+        capacite: parseFloat(document.getElementById('cuveCapacite').value) || 0,
+        typeCuve: document.getElementById('cuveTypeCuve').value,
+        lotId: document.getElementById('cuveLot').value,
+        volumeActuel: parseFloat(document.getElementById('cuveVolumeActuel').value) || 0,
+        temperature: parseFloat(document.getElementById('cuveTemperature').value) || 0,
+        notes: document.getElementById('cuveNotes').value
+    };
+
+    const index = data.cuves.findIndex(c => c.id === id);
+    if (index >= 0) {
+        data.cuves[index] = cuve;
+    } else {
+        data.cuves.push(cuve);
+    }
+
+    saveData();
+    closeModal('modalCuve');
+    render();
+}
+
+function saveOperation(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('operationId').value || Date.now().toString();
+    const operation = {
+        id: id,
+        date: document.getElementById('operationDate').value,
+        type: document.getElementById('operationType').value,
+        cuveId: document.getElementById('operationCuve').value,
+        details: document.getElementById('operationDetails').value,
+        dateCreation: new Date().toISOString()
+    };
+
+    const index = data.operations.findIndex(o => o.id === id);
+    if (index >= 0) {
+        data.operations[index] = operation;
+    } else {
+        data.operations.push(operation);
+    }
+
+    saveData();
+    closeModal('modalOperation');
+    render();
+}
+
+function saveAnalyse(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('analyseId').value || Date.now().toString();
+    const analyse = {
+        id: id,
+        date: document.getElementById('analyseDate').value,
+        lotId: document.getElementById('analyseLot').value,
+        densite: parseFloat(document.getElementById('analyseDensite').value) || null,
+        alcool: parseFloat(document.getElementById('analyseAlcool').value) || null,
+        so2Libre: parseFloat(document.getElementById('analyseSo2Libre').value) || null,
+        so2Total: parseFloat(document.getElementById('analyseSo2Total').value) || null,
+        ph: parseFloat(document.getElementById('analysePh').value) || null,
+        acidite: parseFloat(document.getElementById('analyseAcidite').value) || null,
+        notes: document.getElementById('analyseNotes').value
+    };
+
+    const index = data.analyses.findIndex(a => a.id === id);
+    if (index >= 0) {
+        data.analyses[index] = analyse;
+    } else {
+        data.analyses.push(analyse);
+    }
+
+    saveData();
+    closeModal('modalAnalyse');
+    render();
+}
+
+function saveAssemblage(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('assemblageId').value || Date.now().toString();
+    const assemblage = {
+        id: id,
+        nom: document.getElementById('assemblageNom').value,
+        type: document.getElementById('assemblageType').value,
+        date: document.getElementById('assemblageDate').value,
+        composition: document.getElementById('assemblageComposition').value,
+        volume: parseFloat(document.getElementById('assemblageVolume').value) || 0,
+        notes: document.getElementById('assemblageNotes').value,
+        dateCreation: new Date().toISOString()
+    };
+
+    const index = data.assemblages.findIndex(a => a.id === id);
+    if (index >= 0) {
+        data.assemblages[index] = assemblage;
+    } else {
+        data.assemblages.push(assemblage);
+    }
+
+    saveData();
+    closeModal('modalAssemblage');
+    render();
+}
+
+// ===== SUPPRESSION =====
+
+function deleteLot(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce lot ?')) {
+        data.lots = data.lots.filter(l => l.id !== id);
+        saveData();
+        render();
+    }
+}
+
+function deleteCuve(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette cuve ?')) {
+        data.cuves = data.cuves.filter(c => c.id !== id);
+        saveData();
+        render();
+    }
+}
+
+function deleteOperation(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette opération ?')) {
+        data.operations = data.operations.filter(o => o.id !== id);
+        saveData();
+        render();
+    }
+}
+
+function deleteAnalyse(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cette analyse ?')) {
+        data.analyses = data.analyses.filter(a => a.id !== id);
+        saveData();
+        render();
+    }
+}
+
+function deleteAssemblage(id) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet assemblage ?')) {
+        data.assemblages = data.assemblages.filter(a => a.id !== id);
+        saveData();
+        render();
+    }
+}
+
+// ===== RENDU =====
+
+function render() {
+    renderStats();
+    renderDashboard();
+    renderLots();
+    renderCuves();
+    renderOperations();
+    renderAnalyses();
+    renderAssemblages();
+    renderTracabilite();
+}
+
+function renderStats() {
+    document.getElementById('statLots').textContent = data.lots.length;
+
+    const volumeTotal = data.lots.reduce((sum, lot) => sum + (lot.volume || 0), 0);
+    document.getElementById('statVolume').innerHTML = volumeTotal.toFixed(0) + '<span class="stat-unit">L</span>';
+
+    const cuvesOccupees = data.cuves.filter(c => c.volumeActuel > 0).length;
+    document.getElementById('statCuves').innerHTML = `${cuvesOccupees}/${data.cuves.length}`;
+
+    document.getElementById('statOperations').textContent = data.operations.length;
+}
+
+function renderDashboard() {
+    // Dernières opérations
+    const recentOps = [...data.operations]
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .slice(0, 5);
+
+    const opsContainer = document.getElementById('dashRecentOperations');
+    if (recentOps.length === 0) {
+        opsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚙️</div><p>Aucune opération enregistrée</p></div>';
+    } else {
+        opsContainer.innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Cuve/Lot</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${recentOps.map(op => {
+                        const cuve = data.cuves.find(c => c.id === op.cuveId);
+                        const cuveName = cuve ? cuve.nom : 'N/A';
+                        return `
+                            <tr>
+                                <td>${formatDate(op.date)}</td>
+                                <td>${op.type}</td>
+                                <td>${cuveName}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+    }
+
+    // Lots en cours
+    const lotsEnCours = data.lots.slice(0, 5);
+    const lotsContainer = document.getElementById('dashLotsEnCours');
+    if (lotsEnCours.length === 0) {
+        lotsContainer.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍇</div><p>Aucun lot en vinification</p></div>';
+    } else {
+        lotsContainer.innerHTML = lotsEnCours.map(lot => `
+            <div style="padding:1rem;border-bottom:1px solid var(--rose-pale);display:flex;justify-content:space-between;align-items:center">
+                <div>
+                    <strong>${lot.nom}</strong>
+                    <span class="badge badge-${lot.type}">${lot.type}</span>
+                </div>
+                <div style="text-align:right">
+                    <div>${lot.volume} L</div>
+                    <div style="font-size:0.85rem;color:var(--texte-light)">${lot.cepage}</div>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function renderLots() {
+    const container = document.getElementById('lotsContent');
+
+    if (data.lots.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🍇</div><p>Aucun lot créé. Créez votre premier lot de raisin.</p></div>';
+        return;
+    }
+
+    container.innerHTML = data.lots.map(lot => `
+        <div class="lot-card" onclick="openModalLot('${lot.id}')">
+            <div class="lot-header">
+                <div>
+                    <div class="lot-name">${lot.nom}</div>
+                    <span class="badge badge-${lot.type}">${lot.type}</span>
+                </div>
+                <div class="table-actions" onclick="event.stopPropagation()">
+                    <button class="btn btn-small btn-secondary" onclick="deleteLot('${lot.id}')">🗑️</button>
+                </div>
+            </div>
+            <div class="lot-info">
+                <div class="lot-info-row">
+                    <span class="lot-info-label">Millésime</span>
+                    <span class="lot-info-value">${lot.millesime}</span>
+                </div>
+                <div class="lot-info-row">
+                    <span class="lot-info-label">Cépage</span>
+                    <span class="lot-info-value">${lot.cepage}</span>
+                </div>
+                <div class="lot-info-row">
+                    <span class="lot-info-label">Volume</span>
+                    <span class="lot-info-value">${lot.volume} L</span>
+                </div>
+                <div class="lot-info-row">
+                    <span class="lot-info-label">Degré initial</span>
+                    <span class="lot-info-value">${lot.degre}°</span>
+                </div>
+                ${lot.parcelle ? `
+                <div class="lot-info-row">
+                    <span class="lot-info-label">Parcelle</span>
+                    <span class="lot-info-value">${lot.parcelle}</span>
+                </div>
+                ` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderCuves() {
+    const container = document.getElementById('cuvesContent');
+
+    if (data.cuves.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🛢️</div><p>Aucune cuve enregistrée. Ajoutez vos cuves.</p></div>';
+        return;
+    }
+
+    container.innerHTML = data.cuves.map(cuve => {
+        const lot = cuve.lotId ? data.lots.find(l => l.id === cuve.lotId) : null;
+        const pourcentage = (cuve.volumeActuel / cuve.capacite * 100).toFixed(0);
+
+        return `
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                    <h3 class="card-title" style="margin:0">${cuve.nom}</h3>
+                    <div class="table-actions">
+                        <button class="btn btn-small btn-secondary" onclick="openModalCuve('${cuve.id}')">✏️</button>
+                        <button class="btn btn-small btn-secondary" onclick="deleteCuve('${cuve.id}')">🗑️</button>
+                    </div>
+                </div>
+
+                <div class="cuve-visual">
+                    <div class="cuve-fill" style="height:${pourcentage}%">
+                        ${pourcentage > 10 ? pourcentage + '%' : ''}
+                    </div>
+                </div>
+
+                <div class="cuve-info">
+                    <div class="cuve-info-item">
+                        <div class="cuve-info-label">Capacité</div>
+                        <div class="cuve-info-value">${cuve.capacite} L</div>
+                    </div>
+                    <div class="cuve-info-item">
+                        <div class="cuve-info-label">Volume actuel</div>
+                        <div class="cuve-info-value">${cuve.volumeActuel} L</div>
+                    </div>
+                    <div class="cuve-info-item">
+                        <div class="cuve-info-label">Type</div>
+                        <div class="cuve-info-value">${cuve.typeCuve}</div>
+                    </div>
+                    ${cuve.temperature ? `
+                    <div class="cuve-info-item">
+                        <div class="cuve-info-label">Température</div>
+                        <div class="cuve-info-value">${cuve.temperature}°C</div>
+                    </div>
+                    ` : ''}
+                </div>
+
+                ${lot ? `
+                    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--rose-pale)">
+                        <strong>Contenu :</strong> ${lot.nom} <span class="badge badge-${lot.type}">${lot.type}</span>
+                    </div>
+                ` : '<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--rose-pale);color:var(--texte-light)">Cuve vide</div>'}
+            </div>
+        `;
+    }).join('');
+}
+
+function renderOperations() {
+    const tbody = document.getElementById('operationsTable');
+
+    if (data.operations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--texte-light)">Aucune opération enregistrée</td></tr>';
+        return;
+    }
+
+    const sortedOps = [...data.operations].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    tbody.innerHTML = sortedOps.map(op => {
+        const cuve = data.cuves.find(c => c.id === op.cuveId);
+        const cuveName = cuve ? cuve.nom : 'N/A';
+
+        return `
+            <tr>
+                <td>${formatDate(op.date)}</td>
+                <td><strong>${op.type}</strong></td>
+                <td>${cuveName}</td>
+                <td>${op.details || '-'}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-small btn-secondary" onclick="openModalOperation('${op.id}')">✏️</button>
+                        <button class="btn btn-small btn-secondary" onclick="deleteOperation('${op.id}')">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderAnalyses() {
+    const tbody = document.getElementById('analysesTable');
+
+    if (data.analyses.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--texte-light)">Aucune analyse enregistrée</td></tr>';
+        return;
+    }
+
+    const sortedAnalyses = [...data.analyses].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    tbody.innerHTML = sortedAnalyses.map(analyse => {
+        const cuve = data.cuves.find(c => c.id === analyse.lotId);
+        const lot = data.lots.find(l => l.id === analyse.lotId);
+        const name = cuve ? cuve.nom : (lot ? lot.nom : 'N/A');
+
+        return `
+            <tr>
+                <td>${formatDate(analyse.date)}</td>
+                <td>${name}</td>
+                <td>${analyse.densite || '-'}</td>
+                <td>${analyse.alcool ? analyse.alcool + '%' : '-'}</td>
+                <td>${analyse.so2Libre || '-'}${analyse.so2Total ? ' / ' + analyse.so2Total : ''}</td>
+                <td>${analyse.ph || '-'}</td>
+                <td>${analyse.acidite || '-'}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-small btn-secondary" onclick="openModalAnalyse('${analyse.id}')">✏️</button>
+                        <button class="btn btn-small btn-secondary" onclick="deleteAnalyse('${analyse.id}')">🗑️</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderAssemblages() {
+    const container = document.getElementById('assemblagesContent');
+
+    if (data.assemblages.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔄</div><p>Aucun assemblage créé.</p></div>';
+        return;
+    }
+
+    container.innerHTML = data.assemblages.map(ass => `
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                <h3 class="card-title" style="margin:0">${ass.nom}</h3>
+                <div class="table-actions">
+                    <button class="btn btn-small btn-secondary" onclick="openModalAssemblage('${ass.id}')">✏️</button>
+                    <button class="btn btn-small btn-secondary" onclick="deleteAssemblage('${ass.id}')">🗑️</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom:1rem">
+                <span class="badge badge-${ass.type}">${ass.type}</span>
+                <span style="margin-left:1rem;color:var(--texte-light)">
+                    ${ass.date ? formatDate(ass.date) : ''}
+                </span>
+            </div>
+
+            <div style="background:var(--blanc-casse);padding:1rem;border-radius:10px;margin-bottom:1rem">
+                <strong>Composition :</strong>
+                <pre style="margin-top:0.5rem;font-family:inherit;white-space:pre-wrap">${ass.composition}</pre>
+            </div>
+
+            <div style="display:flex;justify-content:space-between">
+                <div>
+                    <strong>Volume total :</strong> ${ass.volume} L
+                </div>
+            </div>
+
+            ${ass.notes ? `
+                <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--rose-pale);color:var(--texte-light)">
+                    ${ass.notes}
+                </div>
+            ` : ''}
+        </div>
+    `).join('');
+}
+
+function renderTracabilite() {
+    // Remplir le select
+    const select = document.getElementById('tracabiliteSelectLot');
+    select.innerHTML = '<option value="">-- Choisir un lot --</option>' +
+        data.lots.map(lot => `<option value="${lot.id}">${lot.nom}</option>`).join('');
+}
+
+function afficherTracabilite() {
+    const lotId = document.getElementById('tracabiliteSelectLot').value;
+    const container = document.getElementById('tracabiliteContent');
+
+    if (!lotId) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const lot = data.lots.find(l => l.id === lotId);
+    if (!lot) return;
+
+    // Trouver toutes les données liées
+    const cuvesLiees = data.cuves.filter(c => c.lotId === lotId);
+    const operationsLiees = data.operations.filter(op => {
+        const cuve = data.cuves.find(c => c.id === op.cuveId);
+        return cuve && cuve.lotId === lotId;
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const analysesLiees = data.analyses.filter(a => a.lotId === lotId)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    container.innerHTML = `
+        <div class="card" style="margin-top:2rem">
+            <h3 class="card-title">Informations du lot</h3>
+            <div class="lot-info-row">
+                <span class="lot-info-label">Nom</span>
+                <span class="lot-info-value">${lot.nom}</span>
+            </div>
+            <div class="lot-info-row">
+                <span class="lot-info-label">Type</span>
+                <span class="badge badge-${lot.type}">${lot.type}</span>
+            </div>
+            <div class="lot-info-row">
+                <span class="lot-info-label">Millésime</span>
+                <span class="lot-info-value">${lot.millesime}</span>
+            </div>
+            <div class="lot-info-row">
+                <span class="lot-info-label">Cépage</span>
+                <span class="lot-info-value">${lot.cepage}</span>
+            </div>
+            <div class="lot-info-row">
+                <span class="lot-info-label">Volume</span>
+                <span class="lot-info-value">${lot.volume} L</span>
+            </div>
+            ${lot.parcelle ? `
+            <div class="lot-info-row">
+                <span class="lot-info-label">Parcelle</span>
+                <span class="lot-info-value">${lot.parcelle}</span>
+            </div>
+            ` : ''}
+            ${lot.dateRecolte ? `
+            <div class="lot-info-row">
+                <span class="lot-info-label">Date de récolte</span>
+                <span class="lot-info-value">${formatDate(lot.dateRecolte)}</span>
+            </div>
+            ` : ''}
+        </div>
+
+        ${cuvesLiees.length > 0 ? `
+        <div class="card">
+            <h3 class="card-title">🛢️ Cuves associées</h3>
+            ${cuvesLiees.map(c => `<div style="padding:0.5rem;border-bottom:1px solid var(--rose-pale)">${c.nom} (${c.capacite}L)</div>`).join('')}
+        </div>
+        ` : ''}
+
+        <div class="card">
+            <h3 class="card-title">📅 Historique des opérations</h3>
+            ${operationsLiees.length > 0 ? `
+                <div class="timeline">
+                    ${operationsLiees.map(op => {
+                        const cuve = data.cuves.find(c => c.id === op.cuveId);
+                        return `
+                            <div class="timeline-item">
+                                <div class="timeline-date">${formatDate(op.date)}</div>
+                                <div class="timeline-content">
+                                    <div class="timeline-title">${op.type}</div>
+                                    <div>Cuve : ${cuve ? cuve.nom : 'N/A'}</div>
+                                    ${op.details ? `<div style="margin-top:0.5rem;color:var(--texte-light)">${op.details}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            ` : '<p style="color:var(--texte-light)">Aucune opération enregistrée</p>'}
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">🔬 Historique des analyses</h3>
+            ${analysesLiees.length > 0 ? `
+                <div style="overflow-x:auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Densité</th>
+                                <th>Alcool</th>
+                                <th>SO₂</th>
+                                <th>pH</th>
+                                <th>Acidité</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${analysesLiees.map(a => `
+                                <tr>
+                                    <td>${formatDate(a.date)}</td>
+                                    <td>${a.densite || '-'}</td>
+                                    <td>${a.alcool ? a.alcool + '%' : '-'}</td>
+                                    <td>${a.so2Libre || '-'}${a.so2Total ? ' / ' + a.so2Total : ''}</td>
+                                    <td>${a.ph || '-'}</td>
+                                    <td>${a.acidite || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            ` : '<p style="color:var(--texte-light)">Aucune analyse enregistrée</p>'}
+        </div>
+    `;
+}
+
+// ===== UTILITAIRES =====
+
+function populateSelectLots(selectId) {
+    const select = document.getElementById(selectId);
+    select.innerHTML = '<option value="">-- Vide --</option>' +
+        data.lots.map(lot => `<option value="${lot.id}">${lot.nom}</option>`).join('');
+}
+
+function populateSelectCuves(selectId) {
+    const select = document.getElementById(selectId);
+    select.innerHTML = '<option value="">-- Choisir --</option>' +
+        data.cuves.map(cuve => `<option value="${cuve.id}">${cuve.nom}</option>`).join('') +
+        data.lots.map(lot => `<option value="${lot.id}">${lot.nom} (lot)</option>`).join('');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+function exportData(type) {
+    let csvContent = '';
+    let filename = '';
+
+    switch(type) {
+        case 'lots':
+            csvContent = 'Nom,Millésime,Type,Cépage,Volume (L),Degré,pH,Parcelle,Date récolte\n';
+            data.lots.forEach(lot => {
+                csvContent += `"${lot.nom}",${lot.millesime},"${lot.type}","${lot.cepage}",${lot.volume},${lot.degre},${lot.ph},"${lot.parcelle || ''}","${lot.dateRecolte || '"}"\n`;
+            });
+            filename = 'lots_vinification.csv';
+            break;
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+}
+
+// ===== STOCKAGE =====
+
+function loadData() {
+    const saved = localStorage.getItem('vinificationData');
+    if (saved) {
+        try {
+            data = JSON.parse(saved);
+        } catch (e) {
+            console.error('Erreur chargement données:', e);
+        }
+    }
+}
+
+function saveData() {
+    localStorage.setItem('vinificationData', JSON.stringify(data));
+    render();
+}
+
+// ===== INITIALISATION =====
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+    render();
+
+    // Date du jour par défaut
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('operationDate').value = today;
+    document.getElementById('analyseDate').value = today;
+    document.getElementById('assemblageDate').value = today;
+});
+</script>
+
+</body>
+</html>
