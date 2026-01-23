@@ -1,0 +1,37 @@
+# Configuration locale (contient des clés sensibles)
+config.js
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Éditeurs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dépendances (si Node.js est utilisé)
+node_modules/
+
+# Builds
+dist/
+build/
+
+# Environnement
+.env
+.env.local
+.env.*.local
+
+# Sauvegarde des données
+backup/
+*.backup.json
+
+# Fichiers temporaires
+tmp/
+temp/
