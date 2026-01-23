@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les Deux Chênes - Gestion de Cave</title>
+    <meta name="description" content="Gestion et traçabilité des vins">
+    <meta name="theme-color" content="#F4E4E6">
+    <link rel="manifest" href="manifest-cave.json">
+
+    <style>
+        /* ===== DESIGN INSPIRÉ DOMAINES OTT ===== */
+
+        :root {
+            --rose-pale: #F4E4E6;
+            --beige: #E8DDD0;
+            --or-rose: #D4A5A5;
+            --blanc-casse: #FAF8F5;
+            --texte: #2D2424;
+            --texte-light: #6B5E5E;
+            --bordeaux: #8B6B6B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--blanc-casse);
+            color: var(--texte);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        /* ===== HEADER ===== */
+
+        .header {
+            background: linear-gradient(135deg, var(--rose-pale) 0%, var(--beige) 100%);
+            padding: 2rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--or-rose);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: var(--texte);
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1rem;
+            color: var(--texte-light);
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        /* ===== NAVIGATION ===== */
+
+        .nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid var(--or-rose);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            background: none;
+            border: none;
+            color: var(--texte-light);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .tab:hover {
+            background: var(--rose-pale);
+            color: var(--texte);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--or-rose) 0%, var(--bordeaux) 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        /* ===== CONTAINER ===== */
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== PAGE HEADER ===== */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--bordeaux);
+            letter-spacing: 2px;
+        }
+
+        /* ===== BOUTONS ===== */
+
+        .btn {
+            background: linear-gradient(135deg, var(--or-rose) 0%, var(--bordeaux) 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(212, 165, 165, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 165, 165, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--beige);
+            color: var(--texte);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* ===== CARTES ===== */
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            border: 1px solid var(--rose-pale);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 400;
+            color: var(--bordeaux);
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        /* ===== STATS ===== */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--rose-pale) 0%, var(--beige) 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid var(--or-rose);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--texte-light);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: var(--bordeaux);
+        }
+
+        .stat-unit {
+            font-size: 1rem;
+            color: var(--texte-light);
+            margin-left: 0.25rem;
+        }
+
+        /* ===== FORMULAIRES ===== */
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--texte);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input,
+        .form-select,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--rose-pale);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--texte);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--or-rose);
+            box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* ===== TABLE ===== */
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--or-rose) 0%, var(--bordeaux) 100%);
+            color: white;
+            padding: 1rem 0.75rem;
+            text-align: left;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid var(--rose-pale);
+        }
+
+        tr:hover {
+            background: var(--blanc-casse);
+        }
+
+        /* ===== MODAL ===== */
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(45, 36, 36, 0.85);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 3px solid var(--or-rose);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--rose-pale);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--bordeaux);
+            letter-spacing: 1px;
+        }
+
+        .close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: var(--texte-light);
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            background: var(--rose-pale);
+            color: var(--bordeaux);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: flex-end;
+        }
+
+        /* ===== BADGES ===== */
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-rouge {
+            background: #FFE5E5;
+            color: #B91C1C;
+        }
+
+        .badge-rose {
+            background: #FFE5F0;
+            color: #BE185D;
+        }
+
+        .badge-blanc {
+            background: #F3F4F6;
+            color: #374151;
+        }
+
+        /* ===== RESPONSIVE ===== */
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>LES DEUX CHÊNES</h1>
+    <p class="subtitle">Gestion & Traçabilité des Vins</p>
+</div>
+
+<div class="nav">
+    <div class="nav-tabs">
+        <button class="tab active" onclick="changeTab('dashboard')">📊 Tableau de bord</button>
+        <button class="tab" onclick="changeTab('parcelles')">🗺️ Parcelles</button>
+        <button class="tab" onclick="changeTab('lots')">🍇 Lots</button>
+        <button class="tab" onclick="changeTab('cuves')">🛢️ Cuves</button>
+        <button class="tab" onclick="changeTab('assemblages')">🔄 Assemblages</button>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- DASHBOARD -->
+    <div id="dashboard" class="section active">
+        <div class="page-header">
+            <h2 class="page-title">Tableau de bord</h2>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Parcelles</div>
+                <div class="stat-value" id="statParcelles">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Lots de vin</div>
+                <div class="stat-value" id="statLots">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Volume total</div>
+                <div class="stat-value" id="statVolume">0<span class="stat-unit">L</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Cuves</div>
+                <div class="stat-value" id="statCuves">0</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Derniers lots créés</h3>
+            <div id="dashRecentLots">Aucun lot pour le moment</div>
+        </div>
+    </div>
+
+    <!-- PARCELLES -->
+    <div id="parcelles" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Parcelles</h2>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+                <button class="btn" onclick="showImportModal()">📥 Importer CSV/Excel</button>
+                <button class="btn" onclick="showModal('modalParcelle')">+ Ajouter</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div id="parcellesContent">Aucune parcelle</div>
+        </div>
+    </div>
+
+    <!-- LOTS -->
+    <div id="lots" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Lots de vin</h2>
+            <button class="btn" onclick="showModal('modalLot')">+ Nouveau lot</button>
+        </div>
+
+        <div class="card">
+            <div id="lotsContent">Aucun lot</div>
+        </div>
+    </div>
+
+    <!-- CUVES -->
+    <div id="cuves" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Cuves</h2>
+            <button class="btn" onclick="showModal('modalCuve')">+ Nouvelle cuve</button>
+        </div>
+
+        <div class="card">
+            <div id="cuvesContent">Aucune cuve</div>
+        </div>
+    </div>
+
+    <!-- ASSEMBLAGES -->
+    <div id="assemblages" class="section">
+        <div class="page-header">
+            <h2 class="page-title">Assemblages</h2>
+            <button class="btn" onclick="showModal('modalAssemblage')">+ Nouvel assemblage</button>
+        </div>
+
+        <div class="card">
+            <div id="assemblagesContent">Aucun assemblage</div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// ===== DONNÉES =====
+
+let data = {
+    parcelles: [],
+    lots: [],
+    cuves: [],
+    assemblages: []
+};
+
+// ===== NAVIGATION =====
+
+function changeTab(tabName) {
+    // Masquer toutes les sections
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+
+    // Afficher la section demandée
+    document.getElementById(tabName).classList.add('active');
+    event.target.classList.add('active');
+
+    // Rafraîchir les données
+    render();
+}
+
+// ===== MODAL =====
+
+function showModal(modalId) {
+    document.getElementById(modalId).classList.add('show');
+}
+
+function hideModal(modalId) {
+    document.getElementById(modalId).classList.remove('show');
+}
+
+function showImportModal() {
+    alert('Fonction d\'import CSV/Excel en cours de développement...');
+}
+
+// ===== RENDU =====
+
+function render() {
+    renderStats();
+    renderParcelles();
+    renderLots();
+    renderCuves();
+    renderAssemblages();
+}
+
+function renderStats() {
+    document.getElementById('statParcelles').textContent = data.parcelles.length;
+    document.getElementById('statLots').textContent = data.lots.length;
+
+    const volumeTotal = data.lots.reduce((sum, lot) => sum + (lot.volume || 0), 0);
+    document.getElementById('statVolume').innerHTML = volumeTotal + '<span class="stat-unit">L</span>';
+
+    document.getElementById('statCuves').textContent = data.cuves.length;
+}
+
+function renderParcelles() {
+    const container = document.getElementById('parcellesContent');
+
+    if (data.parcelles.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--texte-light);padding:2rem">Aucune parcelle. Importez vos parcelles via CSV/Excel ou ajoutez-en manuellement.</p>';
+        return;
+    }
+
+    container.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Surface (ha)</th>
+                    <th>Cépage</th>
+                    <th>Année plantation</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.parcelles.map(p => `
+                    <tr>
+                        <td><strong>${p.nom}</strong></td>
+                        <td>${p.surface} ha</td>
+                        <td>${p.cepage}</td>
+                        <td>${p.annee}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function renderLots() {
+    const container = document.getElementById('lotsContent');
+
+    if (data.lots.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--texte-light);padding:2rem">Aucun lot de vin.</p>';
+        return;
+    }
+
+    container.innerHTML = `
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Type</th>
+                    <th>Millésime</th>
+                    <th>Volume</th>
+                    <th>Parcelle</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.lots.map(lot => `
+                    <tr>
+                        <td><strong>${lot.nom}</strong></td>
+                        <td><span class="badge badge-${lot.type === 'rouge' ? 'rouge' : lot.type === 'rose' ? 'rose' : 'blanc'}">${lot.type}</span></td>
+                        <td>${lot.millesime}</td>
+                        <td>${lot.volume} L</td>
+                        <td>${lot.parcelle || '-'}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function renderCuves() {
+    const container = document.getElementById('cuvesContent');
+
+    if (data.cuves.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--texte-light);padding:2rem">Aucune cuve.</p>';
+        return;
+    }
+
+    container.innerHTML = data.cuves.map(cuve => `
+        <div style="margin-bottom:1rem;padding:1rem;border:2px solid var(--rose-pale);border-radius:10px">
+            <h4 style="color:var(--bordeaux);margin-bottom:0.5rem">${cuve.nom}</h4>
+            <p>Capacité : ${cuve.capacite} L | Volume actuel : ${cuve.volumeActuel || 0} L</p>
+            <div style="background:var(--rose-pale);height:30px;border-radius:5px;margin-top:0.5rem;overflow:hidden">
+                <div style="background:var(--or-rose);height:100%;width:${(cuve.volumeActuel / cuve.capacite * 100)}%;transition:all 0.3s"></div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function renderAssemblages() {
+    const container = document.getElementById('assemblagesContent');
+
+    if (data.assemblages.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--texte-light);padding:2rem">Aucun assemblage.</p>';
+        return;
+    }
+
+    container.innerHTML = data.assemblages.map(ass => `
+        <div style="margin-bottom:1rem;padding:1rem;border:2px solid var(--rose-pale);border-radius:10px">
+            <h4 style="color:var(--bordeaux);margin-bottom:0.5rem">${ass.nom}</h4>
+            <p>${ass.description}</p>
+        </div>
+    `).join('');
+}
+
+// ===== INIT =====
+
+function loadData() {
+    const saved = localStorage.getItem('caveData');
+    if (saved) {
+        data = JSON.parse(saved);
+    }
+}
+
+function saveData() {
+    localStorage.setItem('caveData', JSON.stringify(data));
+    render();
+}
+
+// Charger au démarrage
+loadData();
+render();
+</script>
+
+</body>
+</html>
