@@ -1,199 +1,236 @@
-# 🍇 Les Deux Chênes - Gestion Viticole
+# 🍇 Les Deux Chênes - Applications Viticoles
 
-Application web progressive (PWA) pour la gestion complète d'un domaine viticole.
+**Suite d'applications web pour la gestion viticole complète**
 
-## 📋 Fonctionnalités actuelles
+---
 
-### ✅ Déjà implémenté
+## 🚀 Démarrage rapide
 
-- **👥 Gestion des clients**
-  - Fiches clients avec photos
-  - Coordonnées complètes (téléphone, email, adresse)
-  - Surface des parcelles
-  - Liens vers documents Drive
-  - Filtrage et recherche
+### 📥 Télécharger et utiliser
 
-- **📋 Gestion des interventions**
-  - 30+ types de travaux viticoles prédéfinis
-  - Suivi des durées et statuts
-  - Planification par client et parcelle
-  - Export PDF et CSV
+1. **Téléchargez le projet** : Cliquez sur le bouton vert `<> Code` puis `Download ZIP`
+2. **Décompressez** le fichier
+3. **Double-cliquez** sur `index.html`
+4. **Choisissez** votre application
 
-- **📦 Gestion des stocks phytosanitaires**
-  - Catalogue de produits avec photos
-  - Stocks par client
-  - Alertes de stock bas
-  - Dosage à l'hectare
+**➡️ Lisez [`START-HERE.md`](START-HERE.md) pour un guide complet et simple**
 
-- **👷 Gestion du personnel**
-  - Fiches employés avec photos
-  - Pointage des heures
-  - Historique du temps de travail
-  - Calcul automatique des heures
+---
 
-- **🗺️ Cartographie**
-  - Intégration Google Maps
-  - Visualisation des parcelles
-  - Statistiques de surface
+## 🌐 Utiliser en ligne
 
-- **💾 Synchronisation**
-  - Mode local (LocalStorage)
-  - Mode cloud (Google Sheets)
-  - Import/Export JSON
-  - Service Worker pour mode hors-ligne
+**Activez GitHub Pages pour accéder depuis n'importe où !**
 
-## 🚀 Installation
+➡️ **Suivez le guide** : [`ACTIVER-GITHUB-PAGES.md`](ACTIVER-GITHUB-PAGES.md)
 
-### 1. Configuration Google Sheets
-
-1. Créez un nouveau Google Sheet nommé "Les Deux Chênes - Data"
-2. Copiez l'ID du Sheet depuis l'URL : `https://docs.google.com/spreadsheets/d/{ID}/edit`
-3. Ouvrez `Code-v2.gs` et remplacez `VOTRE_ID_ICI` par l'ID
-
-### 2. Déploiement Google Apps Script
-
-1. Allez sur [script.google.com](https://script.google.com)
-2. Créez un nouveau projet
-3. Copiez le contenu de `Code-v2.gs`
-4. Déployez en tant qu'application web :
-   - Cliquez sur "Déployer" > "Nouveau déploiement"
-   - Type : Application Web
-   - Exécuter en tant que : Moi
-   - Qui peut accéder : Tout le monde
-5. Copiez l'URL de déploiement
-
-### 3. Configuration de l'application
-
-1. Ouvrez `index.html`
-2. Recherchez `const API_URL` (environ ligne 341)
-3. Remplacez par l'URL de déploiement Google Apps Script
-
-### 4. Hébergement
-
-**Option A : GitHub Pages**
-```bash
-git add .
-git commit -m "Initial commit"
-git push origin main
+Une fois activé, votre application sera accessible à :
 ```
-Activez GitHub Pages dans Settings > Pages
-
-**Option B : Local**
-```bash
-python -m http.server 8000
-# Ouvrir http://localhost:8000
+https://vins83p-hash.github.io/Les-2-Ch-nes/
 ```
 
-**Option C : Netlify/Vercel**
-- Connectez votre dépôt GitHub
-- Déploiement automatique
+---
 
-## 📱 Installation PWA
+## 📱 Applications disponibles
 
-1. Ouvrez l'application dans Chrome/Safari
-2. Cliquez sur "Installer l'application" ou "Ajouter à l'écran d'accueil"
-3. L'application fonctionnera hors-ligne après la première visite
+### 🍇 **Vinification & Traçabilité** (RECOMMANDÉ)
 
-## 🎯 Fonctionnalités prévues
+**Application complète pour la production de vin**
 
-### 🔜 Prochaines améliorations
+📂 **Fichier** : `vinification/index.html`
+🌐 **URL** : `https://vins83p-hash.github.io/Les-2-Ch-nes/vinification/`
 
-- [ ] **🔐 Gestion des droits utilisateurs**
-  - Rôle Ouvrier (lecture seule + pointage)
-  - Rôle Chef de cave (gestion complète sauf admin)
-  - Rôle Admin (tous les droits)
-  - Authentification sécurisée
+**Fonctionnalités** :
+- 📊 Dashboard avec statistiques en temps réel
+- 🍇 Gestion des lots de raisin (réception, caractéristiques)
+- 🛢️ Gestion des cuves avec visualisation du remplissage
+- ⚙️ Opérations de cave (remontage, pigeage, sulfitage, décuvage...)
+- 🔬 Analyses œnologiques (densité, alcool, SO₂, pH, acidité)
+- 🔄 Assemblages avec composition détaillée
+- 📋 Traçabilité complète avec timeline et historique
 
-- [ ] **📜 Export réglementaire**
-  - Export format AOP
-  - Export format DGCCRF
-  - Registre phytosanitaire conforme
-  - Traçabilité complète
+➡️ **Guide** : [`vinification/README.md`](vinification/README.md)
 
-- [ ] **🗂️ Gestion documentaire**
-  - Upload de documents (analyses labo, certificats)
-  - Stockage Google Drive intégré
-  - Catégorisation par type
-  - Recherche et filtrage
+---
 
-- [ ] **📍 Cartographie avancée**
-  - Sélection parcelle sur carte
-  - Calcul automatique de surface
-  - Géolocalisation des interventions
-  - Export KML/GeoJSON
+### 🏺 **Gestion Cave Simple**
 
-- [ ] **🔄 Assemblage multi-lots**
-  - Création d'assemblages
-  - Calcul automatique des proportions
-  - Suivi des lots de vin
-  - Traçabilité des assemblages
+**Interface simplifiée pour gérer une cave de vente**
 
-## 🛠️ Technologies utilisées
+📂 **Fichier** : `cave-simple.html`
+🌐 **URL** : `https://vins83p-hash.github.io/Les-2-Ch-nes/cave-simple.html`
 
-- **Frontend** : HTML5, CSS3, JavaScript (Vanilla)
-- **Backend** : Google Apps Script
-- **Base de données** : Google Sheets
-- **Stockage local** : LocalStorage API
-- **PWA** : Service Worker, Web App Manifest
-- **PDF** : jsPDF + autoTable
-- **Cartes** : Google Maps
+**Fonctionnalités** :
+- 📦 Stocks de bouteilles
+- 👥 Gestion clients
+- 🚚 Livraisons
+- Design élégant inspiré Domaines Ott
 
-## 📄 Structure du projet
+---
+
+### 📊 **Gestion Viticole Complète**
+
+**Application tout-en-un pour domaines viticoles**
+
+📂 **Fichier** : `gestion-complete.html`
+🌐 **URL** : `https://vins83p-hash.github.io/Les-2-Ch-nes/gestion-complete.html`
+
+**Fonctionnalités** :
+- 👥 Gestion des clients avec fiches détaillées
+- 📋 30+ types d'interventions viticoles
+- 📦 Stocks de produits phytosanitaires
+- 👷 Gestion du personnel et pointage
+- 🗺️ Carte des parcelles (Google Maps)
+- 💾 Synchronisation cloud optionnelle (Google Sheets)
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [`START-HERE.md`](START-HERE.md) | 🎯 **Guide ultra-simple pour débutants** |
+| [`ACTIVER-GITHUB-PAGES.md`](ACTIVER-GITHUB-PAGES.md) | 🌐 **Mettre l'application en ligne** |
+| [`GUIDE-SIMPLE.md`](GUIDE-SIMPLE.md) | 📖 Guide d'utilisation détaillé |
+| [`vinification/README.md`](vinification/README.md) | 🍇 Guide spécifique vinification |
+| [`DEMARRER-ICI.md`](DEMARRER-ICI.md) | Guide de démarrage complet |
+| [`INSTALLATION.md`](INSTALLATION.md) | Installation avancée avec Google Sheets |
+
+---
+
+## 💾 Sauvegarde des données
+
+**Toutes les applications sauvegardent vos données automatiquement dans votre navigateur.**
+
+### ⚠️ Important :
+- Utilisez toujours le même navigateur
+- Ne supprimez pas l'historique de navigation
+- Faites des exports réguliers (bouton Export CSV)
+
+### 📤 Export disponible :
+- **CSV** : Pour Excel, Google Sheets
+- **JSON** : Sauvegarde complète
+- **PDF** : Rapports imprimables
+
+---
+
+## 📂 Structure du projet
 
 ```
 Les-2-Ch-nes/
-├── index.html              # Application principale
-├── Code-v2.gs             # Backend Google Apps Script
-├── manifest.json          # Configuration PWA
-├── service-worker.js      # Service Worker pour mode hors-ligne
-├── logo.png               # Logo de l'application
-├── icon-192.png           # Icône PWA 192x192
-├── icon-512.png           # Icône PWA 512x512
-├── background.webp        # Image de fond
-├── heliocuivre.webp       # Image produit exemple
-└── README.md              # Documentation
+├── 📄 index.html                    # Page d'accueil (menu des apps)
+├── 📄 START-HERE.md                 # Guide de démarrage
+├── 📄 ACTIVER-GITHUB-PAGES.md       # Guide GitHub Pages
+│
+├── 📁 vinification/                 # 🍇 App Vinification
+│   ├── index.html                   # Application
+│   └── README.md                    # Documentation
+│
+├── 📄 cave-simple.html              # 🏺 App Cave Simple
+├── 📄 gestion-complete.html         # 📊 App Gestion Complète
+│
+├── 📁 Documentation/
+│   ├── GUIDE-SIMPLE.md
+│   ├── GUIDE-UTILISATEURS.md
+│   ├── INSTALLATION.md
+│   └── ...
+│
+└── 📁 Ressources/
+    ├── logo.png
+    ├── background.webp
+    └── icons/
 ```
 
-## 🔒 Sécurité
+---
 
-- Les données sont stockées dans votre Google Sheet privé
-- Authentification Google pour l'accès au backend
-- Mode hors-ligne avec chiffrement local (à venir)
-- Validation des entrées côté client et serveur
+## 🎨 Design
 
-## 📊 Export des données
+**Design élégant et professionnel inspiré des Domaines Ott**
 
-L'application supporte plusieurs formats d'export :
+- Palette de couleurs raffinée (rose pâle, beige, or rose, bordeaux)
+- Interface responsive (PC, tablette, mobile)
+- Navigation intuitive
+- Thème clair et apaisant
 
-- **JSON** : Sauvegarde complète de toutes les données
-- **CSV** : Export par entité (clients, interventions, stocks, personnel)
-- **PDF** : Rapports formatés avec logo et mise en page professionnelle
+---
 
-## 🤝 Contribution
+## 🛠️ Technologies
 
-Ce projet est propriétaire. Pour toute question ou suggestion, contactez le propriétaire.
+- **Frontend** : HTML5, CSS3, JavaScript (Vanilla)
+- **Stockage** : LocalStorage (navigation locale)
+- **Backend optionnel** : Google Apps Script + Google Sheets
+- **PWA** : Service Worker pour mode hors-ligne
+- **PDF** : jsPDF + autoTable
+- **Cartes** : Google Maps
+
+---
+
+## 📱 Utilisation mobile
+
+**Toutes les applications fonctionnent parfaitement sur mobile !**
+
+1. Activez GitHub Pages (voir guide)
+2. Ouvrez l'URL sur votre téléphone
+3. Ajoutez à l'écran d'accueil (bouton du navigateur)
+4. Utilisez comme une vraie application
+
+---
+
+## 🔒 Sécurité & Confidentialité
+
+- ✅ Toutes vos données restent dans votre navigateur
+- ✅ Aucune donnée n'est envoyée sur Internet (sauf si vous activez la synchro cloud)
+- ✅ Pas de compte, pas de connexion nécessaire
+- ✅ Application 100% gratuite et open-source
+
+---
+
+## 🆘 Aide
+
+### Je n'arrive pas à ouvrir l'application
+➡️ Consultez [`START-HERE.md`](START-HERE.md) étape par étape
+
+### Je veux l'utiliser en ligne
+➡️ Consultez [`ACTIVER-GITHUB-PAGES.md`](ACTIVER-GITHUB-PAGES.md)
+
+### J'ai perdu mes données
+➡️ Vérifiez que vous utilisez le même navigateur
+➡️ Restaurez depuis un export CSV si vous en avez fait
+
+### Comment synchroniser entre plusieurs appareils ?
+➡️ Consultez [`INSTALLATION.md`](INSTALLATION.md) pour la synchro Google Sheets
+
+---
+
+## 🎯 Quelle application choisir ?
+
+| Situation | Application recommandée |
+|-----------|------------------------|
+| Je fais du vin (vinification) | 🍇 **Vinification & Traçabilité** |
+| Je gère une cave de vente | 🏺 **Cave Simple** |
+| Je gère un domaine viticole complet | 📊 **Gestion Complète** |
+| Je veux tout tester | 🏠 **Commencez par la page d'accueil** |
+
+---
+
+## 🚀 Évolutions futures
+
+- [ ] Synchronisation automatique entre appareils
+- [ ] Export format AOP et DGCCRF
+- [ ] Gestion documentaire avancée
+- [ ] Cartographie interactive
+- [ ] Mode multi-utilisateurs
+- [ ] Application mobile native (iOS/Android)
+
+---
 
 ## 📝 Licence
 
 Tous droits réservés © Les Deux Chênes
 
-## 🆘 Support
+---
 
-Pour configurer votre instance :
-1. Suivez scrupuleusement les étapes d'installation
-2. Vérifiez les logs dans la console du navigateur (F12)
-3. Testez d'abord en mode local avant de synchroniser
+## 🍷 Bonne gestion viticole !
 
-## 🎨 Personnalisation
+**Besoin d'aide ?** Consultez [`START-HERE.md`](START-HERE.md) pour commencer.
 
-### Couleurs
-Les couleurs principales sont définies dans `index.html` :
-- Primaire : `#722F37` (bordeaux)
-- Accent : `#D4AF37` (or)
-- Fond : `#1a1a1a` (noir)
-
-### Logo
-Remplacez `logo.png`, `icon-192.png` et `icon-512.png` par vos propres visuels.
-
-### Types d'interventions
-Modifiez la liste dans `index.html` ligne ~259 dans le select `#intType`.
+**Questions ?** Créez une issue sur GitHub ou consultez la documentation.
